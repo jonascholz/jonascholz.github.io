@@ -22,20 +22,20 @@ repository: "jonascholz/jonascholz.github.io"
 author:
   # Biographic information
   avatar: "profile.jpg"
-  name: "Jona Scholz"
+  name: "Hey, nice to meet you!"
   pronouns: # example: "she/her"
-  bio: "Hi, I'm a 26 year old AI
-    Researcher and I work towards Artificial
+  bio: "I'm Jona, a 26 year old AI
+    Researcher working towards Artificial
     General Intelligence. For the most part I was
     following conventional Deep Learning
     research, but in the past year I have focused
     on Spiking Neural Networks due to their
     biological plausibility, energy efficiency and
-    network scalability"
+    network scalability."
   location: "Bochum, Germany"
-  employer: "University of Hagen; FZI Research Center"
+  employer: "FZI Research Center"
   uri: # URL
-  email: "jona.m.scholz[at]gmail.com"
+  email: "jona.m.scholz@gmail.com"
 
   # Academic websites
   arxiv: # URL - Update with the correct link to your profile
