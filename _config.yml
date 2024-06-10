@@ -116,6 +116,9 @@ bing_site_verification:
 alexa_site_verification:
 yandex_site_verification:
 
+# personal variables
+birthdate: 1998-01-31
+
 # Social Sharing
 twitter:
   username: &twitter
@@ -270,7 +273,7 @@ sass:
 permalink: /:categories/:title/
 # paginate: 5 # amount of posts to show
 # paginate_path: /page:num/
-timezone: America/Los_Angeles # http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+timezone: Europe/Berlin # http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 
 # Plugins
 plugins:
