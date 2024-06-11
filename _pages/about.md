@@ -8,7 +8,7 @@ redirect_from:
 ---
 
 <!-- NOTE age is calculated dynamically with a script tag at the end of this file -->
-I'm a {% raw %}<span id="age"></span>{% endraw %} year old AI Researcher working towards Artificial General Intelligence. For the most part I was following conventional Deep Learning research, but in the past year I have focused on Spiking Neural Networks due to their biological plausibility, energy efficiency and network scalability."
+I'm a {% raw %}<span id="age"></span>{% endraw %} year old AI Researcher working towards Artificial General Intelligence. For the most part I was following conventional Deep Learning research, but in the past year I have focused on Spiking Neural Networks due to their biological plausibility, energy efficiency and network scalability.
 
 What I'm up to
 ======

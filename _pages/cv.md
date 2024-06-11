@@ -9,37 +9,45 @@ redirect_from:
 
 {% include base_path %}
 
+Recently my work has been in the field of Neuromorphic Computing or at the Chair of Data Science in Hagen. The latter involved a variety of ML tasks. Prior to this I was a Software Developer, working in typical SCRUM teams or whatever the project required. I manage my code in Git and try to find scalable solutions whenever possible. 
+
 Education
 ======
-* Ph.D in Version Control Theory, GitHub University, 2018 (expected)
-* M.S. in Jekyll, GitHub University, 2014
-* B.S. in GitHub, GitHub University, 2012
+* M.Sc. in Practical Computer Science, University of Hagen, (ongoing)
+* B.Sc. in Applied Computer Science, Ruhr University Bochum, 2019
 
 Work experience
 ======
-* Spring 2024: Academic Pages Collaborator
-  * Github University
-  * Duties includes: Updates and improvements to template
-  * Supervisor: The Users
+* Research Assistant - FZI (Research Center), 2024 - today
+  *  Research on Spiking Neural Networks, implementation of learning
+    algorithms and presentations of findings (see Portfolio, which is coming soon)
 
-* Fall 2015: Research Assistant
-  * Github University
-  * Duties included: Merging pull requests
-  * Supervisor: Professor Hub
 
-* Summer 2015: Research Assistant
-  * Github University
-  * Duties included: Tagging issues
-  * Supervisor: Professor Git
+* Researcher - University of Hagen, 2023 - today
+  * Developed a component for unsupervised ML, worked on the EU project
+    KnowlEdge and supported the Chair of Data Science (see Portfolio, which is coming soon)
+
+
+* Software Developer - Adesso SE, 2020 - 2022
+  * Created Fullstack solutions for 3+ large German companies
+  * Upheld best practices (Clean Code, CI/CD, Design Patterns and more)
   
 Skills
 ======
-* Skill 1
-* Skill 2
-  * Sub-skill 2.1
-  * Sub-skill 2.2
-  * Sub-skill 2.3
-* Skill 3
+* Python
+* Neuromorphic Computing
+  * Lava
+  * Nest
+* Machine Learning
+  * Tensorflow
+  * Scikit-learn
+  * Pandas
+* Fullstack Development
+  * React
+  * Javscript
+  * Node
+  * Angular
+  * PostgreSQL
 
 Publications
 ======
@@ -47,18 +55,18 @@ Publications
     {% include archive-single-cv.html %}
   {% endfor %}</ul>
   
-Talks
+<!-- Talks
 ======
   <ul>{% for post in site.talks reversed %}
     {% include archive-single-talk-cv.html  %}
-  {% endfor %}</ul>
+  {% endfor %}</ul> -->
   
-Teaching
+<!-- Teaching
 ======
   <ul>{% for post in site.teaching reversed %}
     {% include archive-single-cv.html %}
-  {% endfor %}</ul>
+  {% endfor %}</ul> -->
   
-Service and leadership
+<!-- Service and leadership
 ======
-* Currently signed in to 43 different slack teams
+* Currently signed in to 43 different slack teams -->
