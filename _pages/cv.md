@@ -38,7 +38,6 @@ Skills
   flex-wrap: wrap;
   flex-direction: column;
   gap: 20px;
-  justify-content: center;
   margin: 20px 0;
 }
 
@@ -46,8 +45,11 @@ Skills
   display: flex;
   flex-wrap: wrap;
   gap: 20px;
-  justify-content: center;
   margin-bottom: 20px;
+
+  *{
+      box-shadow: none !important; /* icons grow when hovered but for some reason they receive a shadow. this fixes that  */
+   }
 }
 
 .skill-item {
@@ -63,8 +65,7 @@ Skills
 }
 
 .skill-item a:hover {
-  transform: scale(1.1);
-  box-shadow: none !important; /* Ensures box-shadow is removed */
+  transform: scale(1.15);
 }
 
 .skill-item img {
