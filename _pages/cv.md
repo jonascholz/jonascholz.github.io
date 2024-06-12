@@ -20,11 +20,11 @@ Work experience
 ======
 * Research Assistant - FZI (Research Center), 2024 - today
   *  Research on Spiking Neural Networks, implementation of learning
-    algorithms and presentations of findings (see Portfolio, which is coming soon)
+    algorithms and presentations of findings ([learn more](/projects/01_cartpole/))
 
 * Researcher - University of Hagen, 2023 - today
   * Developed a component for unsupervised ML, worked on the EU project
-    KnowlEdge and supported the Chair of Data Science (see Portfolio, which is coming soon)
+    KnowlEdge and supported the Chair of Data Science ([learn more](/projects/02_knowledge/))
 
 * Software Developer - Adesso SE, 2020 - 2022
   * Created Fullstack solutions for 3+ large German companies
@@ -80,7 +80,7 @@ Skills
 </style>
 
 <div class="skills">
-  <b>AI</b>
+  <b>AI & Neuromorphic Computing</b>
   <div class="skill-row">
     <div class="skill-item">
       <a href="https://www.python.org" target="_blank">

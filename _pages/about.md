@@ -13,9 +13,9 @@ I'm a {% raw %}<span id="age"></span>{% endraw %} year old AI Researcher working
 What I'm up to
 ======
 
-This website is a work in progress. CV, Portfolio and Blog sections will follow shortly.
+This website is under development and will be updated slowly over time.
 
-I'm currently working on my Master's Thesis about Actor-Critic Learning in SNNs. Meanwhile I work as a Research Assistant at the FZI and as a Researcher at the University of Hagen. If you are looking to fill a PhD position in Neuromorphic Computing, AI foundation models or anything of the sort, please send me an email.
+I'm currently working on my Master's Thesis about Actor-Critic Learning in SNNs. Meanwhile I'm employed as a Research Assistant at the FZI and as a Researcher at the University of Hagen. If you are looking to fill a PhD position in Neuromorphic Computing, AI foundation models or anything of the sort, please send me an email.
 
 Thoughts on Deep Learning and Neuromorphic Computing
 ======

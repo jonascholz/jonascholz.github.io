@@ -1,14 +1,20 @@
 ---
 layout: archive
-title: "Portfolio"
-permalink: /portfolio/
+title: "Projects (WIP)"
+permalink: /projects/
 author_profile: true
 ---
 
 {% include base_path %}
 
 
-{% for post in site.portfolio %}
-  {% include archive-single.html %}
+{% for post in site.projects %}
+<style>
+    .archive__item {
+        img {
+            max-height: 200px;
+        }
+    }
+</style>
+{% include archive-single.html %}
 {% endfor %}
-
