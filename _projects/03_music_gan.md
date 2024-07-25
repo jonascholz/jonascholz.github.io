@@ -1,6 +1,6 @@
 ---
 title: "Music GAN"
-excerpt: "Here I attempted to train GANs for music generation. Deep Learning enables cool things and generating content is one of them. I read some papers, implemented some things and reasoned about potential solutions. [Learn more](/projects/02_knowledge/)<br/><img src='/images/projects/wave_composition.jpg'>"
+excerpt: "Here I attempted to train GANs for music generation. Deep Learning enables cool things and generating content is one of them. I read some papers, implemented some things and reasoned about potential solutions. [Learn more](/projects/03_music_gan/)<br/><img src='/images/projects/wave_composition.jpg'>"
 collection: projects
 tags: 
     - GAN
