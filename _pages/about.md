@@ -8,12 +8,12 @@ redirect_from:
 ---
 
 <!-- NOTE age is calculated dynamically with a script tag at the end of this file -->
-I'm a {% raw %}<span id="age"></span>{% endraw %} year old AI Researcher working towards a more general Artificial Intelligence. For the most part I was following conventional Deep Learning research, but in the past year I have focused on Spiking Neural Networks due to their biological plausibility, energy efficiency and network scalability.
+I'm a {% raw %}<span id="age"></span>{% endraw %} year old AI Researcher from Bochum. For the most part I was following conventional Deep Learning research, but in the past year I have focused on Spiking Neural Networks due to their biological plausibility, energy efficiency and network scalability.
 
 What I'm up to
 ======
 
-I'm currently working on my Master's Thesis about a Learning Algorithm for SNNs. Meanwhile I'm employed as a Research Assistant at the FZI and as a Researcher at the University of Hagen. If you are looking to fill a PhD position in Neuromorphic Computing, AI foundation models or anything of the sort, please send me an email. 
+I'm currently working on my Master's Thesis about a Learning Algorithm for SNNs. Meanwhile I'm employed as a Research Assistant at the FZI and as a Researcher at the University of Hagen. 
 
 Thoughts on Deep Learning and Neuromorphic Computing
 ======
