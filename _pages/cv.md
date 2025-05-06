@@ -9,24 +9,28 @@ redirect_from:
 
 {% include base_path %}
 
-Recently my work has been in the field of Neuromorphic Computing or at the Chair of Data Science in Hagen. The latter involved data processing and a variety of ML tasks. Prior to this I was a Software Developer, working in typical SCRUM teams or whatever the project required. I manage my code in Git and try to find scalable solutions whenever possible.
+Recently my work has been in the field of Neuromorphic Computing, but I work on anything that may lead to smarter AI. Prior to this I was a Software Developer, working in typical SCRUM teams or whatever the project required. I manage my code in Git and try to find scalable solutions whenever possible.
 
 Education
 ======
-* M.Sc. in Practical Computer Science, University of Hagen, (ongoing)
+* (ongoing) P.hd. at the Institut für Technik der Informationsverarbeitung (ITIV) 
+* M.Sc. in Practical Computer Science, University of Hagen, 2025
 * B.Sc. in Applied Computer Science, Ruhr University Bochum, 2019
 
 Work experience
 ======
-* Research Assistant - FZI (Research Center), 2024 - today
-  *  Research on Spiking Neural Networks, implementation of learning
+* PhD Candidate - KIT, 2025 - today 
+  * Research on learning methods for spiking neural networks
+
+* Research Assistant - FZI (Research Center), 2024 - 2025 (~1 year)
+  * Research on spiking neural networks, implementation of learning
     algorithms and presentations of findings ([learn more](/projects/01_cartpole/))
 
-* Researcher - University of Hagen, 2023 - today
+* Research Associate - University of Hagen, 2023 - 2024 (1.5 years)
   * Developed a component for unsupervised ML, worked on the EU project
     KnowlEdge and supported the Chair of Data Science ([learn more](/projects/02_knowledge/))
 
-* Software Developer - Adesso SE, 2020 - 2022
+* Software Developer - Adesso SE, 2020 - 2022 (almost 3 years)
   * Created Fullstack solutions for 3+ large German companies
   * Upheld best practices (Clean Code, CI/CD, Design Patterns and more)
 
@@ -184,10 +188,10 @@ Skills
     </div>
     <div class="skill-item">
       <a href="https://www.typescriptlang.org" target="_blank">
-        <img src="{{ site.baseurl }}/assets/img/skills/typescript.png" alt="TypesScript">
+        <img src="{{ site.baseurl }}/assets/img/skills/typescript.png" alt="TypeScript">
       </a>
       <div class="skill-text">
-        <p>TypesScript</p>
+        <p>TypeScript</p>
       </div>
     </div>
   </div>

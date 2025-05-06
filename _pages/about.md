@@ -8,18 +8,27 @@ redirect_from:
 ---
 
 <!-- NOTE age is calculated dynamically with a script tag at the end of this file -->
-I'm a {% raw %}<span id="age"></span>{% endraw %} year old AI Researcher from Bochum. For the most part I was following conventional Deep Learning research, but in the past year I have focused on Spiking Neural Networks due to their biological plausibility, energy efficiency and network scalability.
+I'm a {% raw %}<span id="age"></span>{% endraw %} year old AI Researcher from Germany working towards aritifical general intelligence (AGI).
 
-What I'm up to
+Current projects
 ======
+I'm always looking to collaborate. If you do anything that might lead to AGI, hit me up (jona.scholz[at]kit.de) and let's do it together.
 
-I'm currently working on my Master's Thesis about a Learning Algorithm for SNNs. Meanwhile I'm employed as a Research Assistant at the FZI and as a Researcher at the University of Hagen. 
+Right now I am focused on Spiking Neural Networks, as those seem better suited for foundation models, but I'm happy if you can convice me otherwise. Here are some things that I am working on:
 
-Thoughts on Deep Learning and Neuromorphic Computing
+- Survey on training methods for Spiking Neural Networks
+- Studies on credit assignment for local learning rules (e.g. how can we improve DFA mechanism of e-prop)
+- Extending Alex's spike-encoding repo [link to repo](https://github.com/Alex-Vasilache/Spike-Encoding)
+
+Why not pursue conventional ANNs?
 ======
-Deep Learning is great, we have seen so many milestones in the last decade, it's incredible. I was and continue to be fascinated by the latest advances, but it seems to me like the current approach has theoretical limits that are hard to overcome. Particularly the synchronous nature of ANNs, where all layers are involved in all calculations. This does not seem scalable, especially when training a single network on a large variety of tasks.
+**Feedforward connectivity:** We can not reuse circuits that perform key computations. It may be much more efficient to have loops and other types of recurrence.
 
-I want to create an AI that generalizes to many tasks and can be run without a nuclear power plant and thousands of GPUs. To that end, Neuromorphic Computing appears to be pretty promising. While there are many open problems in the space, I am mostly focused on learning algorithms right now. In my current view, learning should be local to enable sparse activations not just during inference but also during training. As far as I am aware, most SNN training is done by converting ANNs or training with surrogate gradients. It appears to me that neither of those will meet the constraints I described.
+**Full activation:** The brain doesn't use every neuron and every connection for every task. Our foundation models would benefit from sparse activations. Only activate neurons that are needed.
+
+Spiking neurons may be better suited to recurrent connectivity and they are built around sparse activations. This might give them advantage in multi-task learning and energy-efficiency. 
+
+Or maybe it doesn't. Right now they don't seem to be great at anything. Perhaps it's just a dead-end. That's what I'm hoping to figure out by the end of 2025.
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
