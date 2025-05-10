@@ -1,144 +1,253 @@
 document.addEventListener('DOMContentLoaded', function() {
     const canvas = document.getElementById('neuronCanvas');
     const ctx = canvas.getContext('2d');
+    const probabilitySlider = document.getElementById('spikeProbability');
+    const probabilityValue = document.getElementById('probabilityValue');
+    const decaySlider = document.getElementById('decayRate');
+    const decayValue = document.getElementById('decayValue');
+
+    // Network layout
+    const inputLayer = [
+        { x: 100, y: 150 },
+        { x: 100, y: 250 }
+    ];
+    const hiddenLayer = [
+        { x: 400, y: 100 },
+        { x: 400, y: 200 },
+        { x: 400, y: 300 }
+    ];
+    const outputLayer = [
+        { x: 700, y: 150 },
+        { x: 700, y: 250 }
+    ];
+
+    // Connection weights (randomly initialized between 0.3 and 2.5)
+    const weights = {
+        inputToHidden: [
+            [2.0, 0.4, 1.8],  // Input 1 to Hidden 1,2,3
+            [0.3, 2.2, 0.5]   // Input 2 to Hidden 1,2,3
+        ],
+        hiddenToOutput: [
+            [2.3, 0.4],  // Hidden 1 to Output 1,2
+            [0.5, 2.1],  // Hidden 2 to Output 1,2
+            [1.9, 0.6]   // Hidden 3 to Output 1,2
+        ]
+    };
 
     // Neuron properties
-    let membranePotential = 0;
-    const threshold = 100;
+    const neuronRadius = 20;
+    const threshold = 300;
     const resetPotential = 0;
-    const decayRate = 0.5; // Potential decay per frame
-    const potentialRise = 35; // Potential increase per spike
-
-    // Neuron position and size
-    const neuronX = canvas.width / 2;
-    const neuronY = canvas.height / 2;
-    const neuronRadius = 30;
-
-    // Input connection
-    const inputStartX = 50;
-    const inputStartY = neuronY;
-    const inputEndX = neuronX - neuronRadius;
-    const inputEndY = neuronY;
-
-    // Output connection
-    const outputStartX = neuronX + neuronRadius;
-    const outputStartY = neuronY;
-    const outputEndX = canvas.width - 50;
-    const outputEndY = neuronY;
-
-    let incomingSpikes = []; // { x, y, active }
-    let outgoingSpike = null; // { x, y, active }
-    const spikeSpeed = 5;
+    let decayRate = 0.4;
+    const potentialRise = 50;
+    const spikeSpeed = 7;
     const spikeRadius = 5;
+    const updateInterval = 50; // ms between potential updates
 
-    function drawNeuron() {
-      // Draw neuron body with color based on membrane potential
-      ctx.beginPath();
-      ctx.arc(neuronX, neuronY, neuronRadius, 0, Math.PI * 2);
-      
-      // Calculate color intensity based on membrane potential
-      const intensity = Math.min(255, Math.max(0, (membranePotential / threshold) * 255));
-      ctx.fillStyle = `rgb(0, ${intensity}, 0)`; // Green color
-      ctx.fill();
+    // Network state
+    const neurons = {
+        input: [
+            { potential: 0, spikes: [] },
+            { potential: 0, spikes: [] }
+        ],
+        hidden: [
+            { potential: 0, spikes: [] },
+            { potential: 0, spikes: [] },
+            { potential: 0, spikes: [] }
+        ],
+        output: [
+            { potential: 0, spikes: [] },
+            { potential: 0, spikes: [] }
+        ]
+    };
 
-      // Only draw outline if threshold is surpassed
-      if (membranePotential >= threshold) {
-        ctx.strokeStyle = 'yellow';
-        ctx.lineWidth = 2;
+    function drawNeuron(x, y, potential, isThreshold) {
+        ctx.beginPath();
+        ctx.arc(x, y, neuronRadius, 0, Math.PI * 2);
+        
+        const intensity = Math.min(255, Math.max(0, (potential / threshold) * 255));
+        ctx.fillStyle = `rgb(0, ${50 + intensity}, 0)`;
+        ctx.fill();
+
+        if (isThreshold) {
+            ctx.strokeStyle = 'yellow';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+    }
+
+    function drawConnection(startX, startY, endX, endY, weight) {
+        const lineWidth = Math.max(1, Math.min(6, weight * 2.5));
+        ctx.lineWidth = lineWidth;
+        ctx.strokeStyle = 'grey';
+        ctx.beginPath();
+        ctx.moveTo(startX + neuronRadius, startY);
+        ctx.lineTo(endX - neuronRadius, endY);
         ctx.stroke();
-      }
-
-      // Draw connections
-      ctx.lineWidth = 2;
-      ctx.strokeStyle = 'grey';
-      ctx.beginPath();
-      ctx.moveTo(inputStartX, inputStartY);
-      ctx.lineTo(inputEndX, inputEndY);
-      ctx.stroke();
-
-      ctx.beginPath();
-      ctx.moveTo(outputStartX, outputStartY);
-      ctx.lineTo(outputEndX, outputEndY);
-      ctx.stroke();
     }
 
     function drawSpike(spike) {
-      if (spike && spike.active) {
-        ctx.beginPath();
-        ctx.arc(spike.x, spike.y, spikeRadius, 0, Math.PI * 2);
-        ctx.fillStyle = 'orange';
-        ctx.fill();
-      }
+        if (spike && spike.active) {
+            ctx.beginPath();
+            ctx.arc(spike.x, spike.y, spikeRadius, 0, Math.PI * 2);
+            ctx.fillStyle = 'orange';
+            ctx.fill();
+        }
     }
 
-    function updateIncomingSpikes() {
-      for (let i = incomingSpikes.length - 1; i >= 0; i--) {
-        let spike = incomingSpikes[i];
-        if (spike.active) {
-          spike.x += spikeSpeed;
-          if (spike.x >= inputEndX - spikeRadius) { // Spike reaches neuron
-            membranePotential += potentialRise;
-            spike.active = false; // Deactivate spike
-          }
+    function updateSpikePosition(spike) {
+        if (!spike.active) return;
+
+        const dx = spike.targetX - spike.startX;
+        const dy = spike.targetY - spike.startY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        const progress = spike.progress + (spikeSpeed / distance);
+        
+        if (progress >= 1) {
+            spike.active = false;
+            if (spike.target) {
+                spike.target.potential += potentialRise * spike.weight;
+            }
+        } else {
+            spike.x = spike.startX + dx * progress;
+            spike.y = spike.startY + dy * progress;
+            spike.progress = progress;
         }
-      }
-      // Remove inactive spikes
-      incomingSpikes = incomingSpikes.filter(s => s.active || s.x < inputEndX - spikeRadius);
     }
 
-    function updateOutgoingSpike() {
-      if (outgoingSpike && outgoingSpike.active) {
-        outgoingSpike.x += spikeSpeed;
-        if (outgoingSpike.x >= outputEndX) {
-          outgoingSpike.active = false; // Deactivate spike at end of axon
+    function updatePotential(neuron) {
+        if (neuron.potential > resetPotential) {
+            neuron.potential -= decayRate;
         }
-      }
+        if (neuron.potential < resetPotential) {
+            neuron.potential = resetPotential;
+        }
+
+        if (neuron.potential >= threshold) {
+            neuron.potential = resetPotential;
+            return true;
+        }
+        return false;
     }
 
-    function updatePotential() {
-      // Decay potential
-      if (membranePotential > resetPotential) {
-        membranePotential -= decayRate;
-      }
-      if (membranePotential < resetPotential) {
-        membranePotential = resetPotential;
-      }
-
-      // Check for firing
-      if (membranePotential >= threshold) {
-        membranePotential = resetPotential; // Reset potential
-        // Create an outgoing spike
-        if (!outgoingSpike || !outgoingSpike.active) { // Fire only if no active outgoing spike
-             outgoingSpike = { x: outputStartX + spikeRadius, y: outputStartY, active: true };
+    function generateSpike(neuron, startX, startY, targetX, targetY, target, weight) {
+        // Only check for recent spikes on this specific connection
+        const hasRecentSpike = neuron.spikes.some(s => 
+            s.active && s.progress < 0.1 && 
+            s.targetX === targetX && s.targetY === targetY
+        );
+        
+        if (!hasRecentSpike) {
+            neuron.spikes.push({
+                x: startX,
+                y: startY,
+                startX: startX,
+                startY: startY,
+                targetX: targetX,
+                targetY: targetY,
+                target: target,
+                weight: weight,
+                progress: 0,
+                active: true
+            });
         }
-      }
+    }
+
+    function tryGenerateInputSpikes() {
+        const probability = parseInt(probabilitySlider.value) / 100;
+        
+        // Try to generate spikes for both inputs
+        neurons.input.forEach((input, i) => {
+            if (Math.random() < probability) {
+                const startX = inputLayer[i].x;
+                const startY = inputLayer[i].y;
+                
+                // Generate spikes to all hidden neurons
+                hiddenLayer.forEach((hidden, j) => {
+                    // Only check if there's already a spike on this specific connection
+                    const hasRecentSpike = input.spikes.some(s => 
+                        s.active && s.progress < 0.1 && 
+                        s.targetX === hidden.x && s.targetY === hidden.y
+                    );
+                    
+                    if (!hasRecentSpike) {
+                        generateSpike(input, startX, startY, hidden.x, hidden.y, 
+                            neurons.hidden[j], weights.inputToHidden[i][j]);
+                    }
+                });
+            }
+        });
+
+        setTimeout(tryGenerateInputSpikes, updateInterval);
     }
 
     function gameLoop() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      updatePotential();
-      updateIncomingSpikes();
-      updateOutgoingSpike();
+        // Draw connections
+        inputLayer.forEach((input, i) => {
+            hiddenLayer.forEach((hidden, j) => {
+                drawConnection(input.x, input.y, hidden.x, hidden.y, weights.inputToHidden[i][j]);
+            });
+        });
+        hiddenLayer.forEach((hidden, i) => {
+            outputLayer.forEach((output, j) => {
+                drawConnection(hidden.x, hidden.y, output.x, output.y, weights.hiddenToOutput[i][j]);
+            });
+        });
 
-      drawNeuron();
-      incomingSpikes.forEach(drawSpike);
-      drawSpike(outgoingSpike);
+        // Update and draw input neurons
+        neurons.input.forEach((neuron, i) => {
+            neuron.spikes.forEach(updateSpikePosition);
+            neuron.spikes = neuron.spikes.filter(s => s.active);
+            neuron.spikes.forEach(drawSpike);
+            drawNeuron(inputLayer[i].x, inputLayer[i].y, neuron.potential, 
+                neuron.potential >= threshold);
+        });
 
-      requestAnimationFrame(gameLoop);
+        // Update and draw hidden neurons
+        neurons.hidden.forEach((neuron, i) => {
+            neuron.spikes.forEach(updateSpikePosition);
+            neuron.spikes = neuron.spikes.filter(s => s.active);
+            neuron.spikes.forEach(drawSpike);
+            const fired = updatePotential(neuron);
+            if (fired) {
+                outputLayer.forEach((output, j) => {
+                    generateSpike(neuron, hiddenLayer[i].x, hiddenLayer[i].y, 
+                        output.x, output.y, neurons.output[j], weights.hiddenToOutput[i][j]);
+                });
+            }
+            drawNeuron(hiddenLayer[i].x, hiddenLayer[i].y, neuron.potential, 
+                neuron.potential >= threshold);
+        });
+
+        // Update and draw output neurons
+        neurons.output.forEach((neuron, i) => {
+            neuron.spikes.forEach(updateSpikePosition);
+            neuron.spikes = neuron.spikes.filter(s => s.active);
+            neuron.spikes.forEach(drawSpike);
+            updatePotential(neuron);
+            drawNeuron(outputLayer[i].x, outputLayer[i].y, neuron.potential, 
+                neuron.potential >= threshold);
+        });
+
+        requestAnimationFrame(gameLoop);
     }
 
-    // Generate random spikes
-    function generateRandomSpike() {
-      if (!incomingSpikes.length || incomingSpikes[incomingSpikes.length-1].x > inputStartX + 50) {
-        incomingSpikes.push({ x: inputStartX, y: inputStartY, active: true });
-      }
-      // Schedule next spike with random delay between 1 and 4 seconds
-      setTimeout(generateRandomSpike, Math.random() * 1000 + 300);
-    }
+    // Update probability display
+    probabilitySlider.addEventListener('input', function() {
+        probabilityValue.textContent = this.value;
+    });
 
-    // Start generating random spikes
-    generateRandomSpike();
+    // Update decay rate display and value
+    decaySlider.addEventListener('input', function() {
+        const value = parseInt(this.value) / 10;
+        decayValue.textContent = value.toFixed(1);
+        decayRate = value;
+    });
+
+    // Start generating spikes
+    tryGenerateInputSpikes();
 
     gameLoop();
 }); 

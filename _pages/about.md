@@ -32,7 +32,19 @@ Or maybe it doesn't. Right now they don't seem to be great at anything. Perhaps 
 
 Spiking Neuron Animation
 ======
-<canvas id="neuronCanvas" width="600" height="200"></canvas>
+<div style="margin-bottom: 10px;">
+  <div style="margin-bottom: 5px;">
+    <label for="spikeProbability">Input Spike Probability: </label>
+    <input type="range" id="spikeProbability" min="1" max="5" value="3" step="1">
+    <span id="probabilityValue">3</span>%
+  </div>
+  <div style="margin-bottom: 5px;">
+    <label for="decayRate">Membrane Decay Rate: </label>
+    <input type="range" id="decayRate" min="2" max="6" value="4" step="1">
+    <span id="decayValue">0.4</span> per frame
+  </div>
+</div>
+<canvas id="neuronCanvas" width="800" height="400"></canvas>
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
