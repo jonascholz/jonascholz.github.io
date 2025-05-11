@@ -30,7 +30,7 @@ Spiking neurons may be better suited to recurrent connectivity and they are buil
 
 Or maybe it doesn't. Right now they don't seem to be great at anything. Perhaps it's just a dead-end. That's what I'm hoping to figure out by the end of 2025.
 
-Spiking Neuron Animation
+<!-- Spiking Neuron Animation
 ======
 <div style="margin-bottom: 10px;">
   <div style="margin-bottom: 5px;">
@@ -44,7 +44,7 @@ Spiking Neuron Animation
     <span id="decayValue">0.4</span> per frame
   </div>
 </div>
-<canvas id="neuronCanvas" width="800" height="400"></canvas>
+<canvas id="neuronCanvas" width="800" height="400"></canvas> -->
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
@@ -60,4 +60,4 @@ Spiking Neuron Animation
   });
 </script>
 
-<script src="{{ '/assets/js/neuron-animation.js' | relative_url }}"></script>
+<!-- <script src="{{ '/assets/js/neuron-animation.js' | relative_url }}"></script> -->
