@@ -13,7 +13,7 @@ Recently my work has been in the field of Neuromorphic Computing, but I work on 
 
 Education
 ======
-* (ongoing) P.hd. at the Institut für Technik der Informationsverarbeitung (ITIV) 
+* (ongoing) PhD at the Institut für Technik der Informationsverarbeitung (ITIV) 
 * M.Sc. in Practical Computer Science, University of Hagen, 2025
 * B.Sc. in Applied Computer Science, Ruhr University Bochum, 2019
 
