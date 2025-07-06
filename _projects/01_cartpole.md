@@ -10,6 +10,8 @@ tags:
     - Actor-Critic
 ---
 
+## A recap of my Master's thesis
+
 My supervisor Alexandru Vasilache was working on a system with two loops: the outer evolution loop, changing the network structure and neuron properties and the inner learning loop for online adaptation. This thesis was about the online part. 
 
 Please note that there is a similar thesis by Benedikt Vogler, which I discovered towards the end of my own work ([click here for his thesis](https://benediktsvogler.com/downloads/Training%20of%20Spiking%20Neural%20Networks%20with%20Reinforcement%20Learning.pdf)). This could have probably saved me some time, but ultimately he seems to have struggled to get it to work as well. Here I will describe what I did and what I think could be improved.
