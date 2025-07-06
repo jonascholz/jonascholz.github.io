@@ -52,13 +52,28 @@ document.addEventListener('DOMContentLoaded', function() {
             title: 'AdLIF Neuron Dynamics',
             xaxis: { title: 'Time (steps)' },
             yaxis: { title: 'Value', range: [-0.5, 1.5] },
-            legend: { x: 0.7, y: 0.95 }
+            legend: { x: 0.7, y: 0.95 },
+            margin: { l: 50, r: 50, b: 50, t: 50, pad: 4 }
         };
 
-        Plotly.react('plot', [trace2, trace1, trace3], layout);
+        function updateLegend() {
+            const showLegend = window.innerWidth > 768;
+            Plotly.relayout('plot', { showlegend: showLegend });
+        }
+
+        Plotly.react('plot', [trace2, trace1, trace3], layout).then(() => {
+            updateLegend();
+        });
     }
 
     u0_slider.addEventListener('input', update_plot);
+
+    window.addEventListener('resize', function() {
+        if (document.getElementById('plot').data) {
+            const showLegend = window.innerWidth > 768;
+            Plotly.relayout('plot', { showlegend: showLegend });
+        }
+    });
 
     // Initial plot
     update_plot();
