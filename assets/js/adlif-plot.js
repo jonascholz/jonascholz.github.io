@@ -8,18 +8,8 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
     }
 
-    function update_plot() {
-        const u0 = parseFloat(u0_slider.value);
-        u0_value_span.textContent = u0.toFixed(2);
-
-        // Ensure run_adlif_simulation is available
-        if (typeof run_adlif_simulation !== 'function') {
-            console.error('run_adlif_simulation is not defined. Make sure adlif.js is loaded.');
-            return;
-        }
-
-        const { u, w, s } = run_adlif_simulation({ u0 });
-        const time = Array.from({ length: 200 }, (_, i) => i);
+    function getAdlifTraces({ u, w, s }) {
+        const time = Array.from({ length: u.length }, (_, i) => i);
 
         const trace1 = {
             x: time,
@@ -48,33 +38,22 @@ document.addEventListener('DOMContentLoaded', function() {
             marker: { symbol: 'triangle-up', color: '#ff7f0e', size: 10 }
         };
 
-        const layout = {
+        return [trace2, trace1, trace3];
+    }
+
+    createInteractivePlot({
+        plotId: 'plot',
+        controls: [
+            { sliderId: 'u0_slider', valueSpanId: 'u0_value', paramName: 'u0' }
+        ],
+        simulationFunc: run_adlif_simulation,
+        tracesFunc: getAdlifTraces,
+        layoutOptions: {
             title: 'AdLIF Neuron Dynamics',
             xaxis: { title: 'Time (steps)' },
             yaxis: { title: 'Value', range: [-0.5, 1.5] },
             legend: { x: 0.7, y: 0.95 },
             margin: { l: 50, r: 50, b: 50, t: 50, pad: 4 }
-        };
-
-        function updateLegend() {
-            const showLegend = window.innerWidth > 768;
-            Plotly.relayout('plot', { showlegend: showLegend });
-        }
-
-        Plotly.react('plot', [trace2, trace1, trace3], layout).then(() => {
-            updateLegend();
-        });
-    }
-
-    u0_slider.addEventListener('input', update_plot);
-
-    window.addEventListener('resize', function() {
-        if (document.getElementById('plot').data) {
-            const showLegend = window.innerWidth > 768;
-            Plotly.relayout('plot', { showlegend: showLegend });
         }
     });
-
-    // Initial plot
-    update_plot();
 });
