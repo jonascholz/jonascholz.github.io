@@ -1,14 +1,15 @@
-
 function run_adlif_simulation({
     u0,
     timesteps = 200,
     alpha = 0.98,
     beta = 0.98,
-    a = 20,
+    a = 0,
     b = 0,
     input_current = 0.0,
     threshold = 1.0,
-    u_rest = 0.0
+    u_rest = 0.0,
+    spike_times = [],
+    w_in = 0.0
 }) {
     let u = [u0];
     let w = [0];
@@ -16,7 +17,8 @@ function run_adlif_simulation({
     let u_hat = [];
 
     for (let t = 1; t < timesteps; t++) {
-        const u_hat_t = alpha * u[t - 1] + (1 - alpha) * (-w[t - 1] + input_current);
+        const spike_input = spike_times.includes(t) ? w_in : 0;
+        const u_hat_t = alpha * u[t - 1] + (1 - alpha) * (-w[t - 1] + input_current) + spike_input;
         u_hat.push(u_hat_t);
 
         const s_t = u_hat_t > threshold ? 1 : 0;

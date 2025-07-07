@@ -1,10 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const u0_slider = document.getElementById('u0_slider');
-    const plotDiv = document.getElementById('plot');
-
-    // Exit if plot elements are not on the page
-    if (!u0_slider || !plotDiv) {
-        return;
+    function run_adlif_simulation_with_fixed_u0(params) {
+        return run_adlif_simulation({ ...params, u0: 1.0 });
     }
 
     function getAdlifTraces({ u, w, s }) {
@@ -30,22 +26,16 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     createInteractivePlot({
-        plotId: 'plot',
+        plotId: 'plot2',
         controls: [
-            { sliderId: 'u0_slider', paramName: 'u0' }
+            { sliderId: 'beta_slider', valueSpanId: 'beta_value', paramName: 'beta' },
+            { sliderId: 'a_slider', valueSpanId: 'a_value', paramName: 'a' }
         ],
-        simulationFunc: run_adlif_simulation,
+        simulationFunc: run_adlif_simulation_with_fixed_u0,
         tracesFunc: getAdlifTraces,
-        simulationParams: {
-            a: 20,
-            b: 0,
-            beta: 0.98,
-            spike_times: [],
-            w_in: 0
-        },
         layoutOptions: {
             xaxis: { title: 'Time (steps)' },
-            yaxis: { title: 'Value', range: [-0.5, 1.5] },
+            yaxis: { title: 'Value', range: [-0.5, 2.0] },
             legend: { x: 0.7, y: 0.95 },
             margin: { l: 50, r: 50, b: 50, t: 50, pad: 4 }
         }
