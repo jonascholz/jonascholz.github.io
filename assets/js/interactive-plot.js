@@ -9,6 +9,8 @@ function createInteractivePlot({
     const plotDiv = document.getElementById(plotId);
     if (!plotDiv) return;
 
+    const updateCallbacks = [];
+
     const controlElements = controls && controls.length > 0 ? controls.map(c => ({
         slider: document.getElementById(c.sliderId),
         span: document.getElementById(c.valueSpanId),
@@ -26,7 +28,13 @@ function createInteractivePlot({
             const value = parseFloat(c.slider.value);
             dynamicParams[c.paramName] = value;
         });
-        return { ...simulationParams, ...dynamicParams };
+        
+        let finalSimParams = { ...simulationParams, ...dynamicParams };
+        if (typeof simulationParams === 'function') {
+            finalSimParams = { ...dynamicParams, ...simulationParams(dynamicParams) };
+        }
+
+        return finalSimParams;
     }
 
     function update_plot() {
@@ -54,6 +62,7 @@ function createInteractivePlot({
         }
 
         Plotly.react(plotId, traces, getLayout(), {displayModeBar: false});
+        updateCallbacks.forEach(cb => cb(current_params));
     }
 
     controlElements.forEach(c => {
@@ -71,12 +80,23 @@ function createInteractivePlot({
 
     update_plot(); // Initial plot
 
-    return {
+    const controller = {
         update: update_plot,
         getParams: get_current_params,
         setParam: function(key, value) {
+            if (typeof simulationParams === 'function') {
+                console.error("setParam is not supported when simulationParams is a function.");
+                return;
+            }
             simulationParams[key] = value;
+        },
+        onUpdate: function(callback) {
+            if (typeof callback === 'function') {
+                updateCallbacks.push(callback);
+            }
         },
         getPlotDiv: function() { return plotDiv; }
     };
+
+    return controller;
 }
