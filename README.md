@@ -17,4 +17,4 @@ Since this thing doesn't seem to run on Windows I run it in WSL. Good luck setti
 
 Make sure to follow the instructions from https://github.com/academicpages/academicpages.github.io to set up all the dependencies.
 
-Once everything is installed, run `jekyll serve -l -H localhost` to generate the HTML and serve it from `localhost:4000` the local server will automatically rebuild and refresh the pages on change. Or maybe use `bundle exec jekyll serve -l -H localhost` if that doesn't work.
+Once everything is installed, run `bundle exec jekyll serve -l -H localhost` to generate the HTML and serve it from `localhost:4000` the local server will automatically rebuild and refresh the pages on change. 
