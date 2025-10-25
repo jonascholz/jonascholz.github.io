@@ -2,18 +2,15 @@
 main:
   - title: "Blog"
     url: /blog/
-    
-  - title: "CV"
-    url: /cv/
+
+  - title: "Projects"
+    url: /projects/
 
   # - title: "Talks"
-  #   url: /talks/    
+  #   url: /talks/
 
   # - title: "Teaching"
-  #   url: /teaching/    
-    
-  - title: "Past Projects"
-    url: /projects/
-        
-  - title: "Publications"
-    url: /publications/
+  #   url: /teaching/
+
+  - title: "About"
+    url: /cv/
