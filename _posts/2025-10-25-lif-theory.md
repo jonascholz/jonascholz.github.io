@@ -76,11 +76,34 @@ The soft reset will not always reset the state back to 0, but it's simple and of
 
 The reset term subtracts the threshold when a spike occurred at the previous timestep.  When there was no spike ($$\textcolor{orange}{s[t-1]} = 0$$), nothing is subtracted. Pretty elegant!
 
-But what's the point of this worse RNN model? It's all about efficiency and it comes from two factors: 1) sparse activation 2) reducing multiplications.
+## Vectorizing
+
+So far we've looked at a single neuron with a single incoming connection. In practice, you'll want multiple neurons processing multiple inputs. The good news is that the equations barely change.
+
+Instead of a single membrane potential $$\textcolor{ForestGreen}{u[t]}$$, we now have a vector $$\textcolor{ForestGreen}{U[t]}$$ where each element represents one neuron. Similarly, our spike output becomes a vector $$\textcolor{orange}{S[t]}$$.
+
+The only notable change is that the weight $$\textcolor{red}{w}$$ becomes a weight matrix $$\textcolor{red}{W}$$ that connects each input to each neuron. The vectorized equation looks like this:
+
+\begin{equation}
+\textcolor{ForestGreen}{U[t]} = \textcolor{blue}{\alpha} \textcolor{ForestGreen}{U[t-1]} + \textcolor{red}{W} \textcolor{purple}{X[t]} - \textcolor{orange}{S[t-1]} \textcolor{brown}{\theta}
+\label{eq:lif_vectorized}
+\end{equation}
+
+where the outgoing spikes are multiplied by the threshold element-wise. The spike function also applies element-wise:
+
+\begin{equation}
+\textcolor{orange}{S[t]} = \Theta(\textcolor{ForestGreen}{U[t]} - \textcolor{brown}{\theta})
+\label{eq:spike_vectorized}
+\end{equation}
+
+This vectorized form is what you'll actually implement in code, since it's much more efficient than looping over individual neurons.
+
+But what's the point of this worse RNN model anyway? 
 
 ## Efficiency gains
+It's all about efficiency and it comes from two factors: 1) LIFs have sparse activation 2) LIFs don't need to multiply inputs by weights.
 
-Many of the neurons are not emitting spikes at any point in time. In theory, we only have to process spikes so we only have to perform computations for a small subset of neurons. This principle is shown below.
+Many of the neurons are not emitting spikes at every timestep. Since we only need to process spikes, we don't have to do a lot of processing when there are no spikes. This principle is shown below.
 
 <figure id="fig:lif_sparsity">
 <img src="{{ '/assets/images/lif_sparsity.png' | relative_url }}" alt="LIF network sparsity" style="width: 100%; max-width: 600px; margin: 0 auto; display: block;">
@@ -88,4 +111,3 @@ Many of the neurons are not emitting spikes at any point in time. In theory, we 
 </figure>
 
 Moreover, all modern deep learning is based on Multiply-Accumulate (MAC) operations, where we multiply all the inputs by all the weights and add them up. When the inputs are 0 or 1, we don't actually need to multiply. Instead we can use the inputs as flags to choose which weights to add to our state. We can cut the M from the MAC. 
-
