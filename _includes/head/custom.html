@@ -92,4 +92,48 @@ figcaption strong {
 }
 </style>
 
+<!-- Code copy button script -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Find all code block containers
+  const codeContainers = document.querySelectorAll('div.highlighter-rouge, figure.highlight');
+
+  codeContainers.forEach(function(container) {
+    // Make the ::before pseudo-element clickable by adding a real button
+    container.style.cursor = 'pointer';
+
+    // Add click handler to the container
+    container.addEventListener('click', function(e) {
+      // Only trigger if clicking near the top-right (where the icon is)
+      const rect = container.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const clickY = e.clientY - rect.top;
+
+      // Check if click is in top-right area (approximate icon location)
+      if (clickX > rect.width - 50 && clickY < 50) {
+        // Find the code element
+        const codeElement = container.querySelector('pre, code');
+        if (!codeElement) return;
+
+        const code = codeElement.textContent;
+
+        // Copy to clipboard
+        navigator.clipboard.writeText(code).then(function() {
+          // Visual feedback - temporarily change the icon
+          const originalContent = window.getComputedStyle(container, '::before').content;
+          container.classList.add('copied');
+
+          // Reset after 1 second
+          setTimeout(function() {
+            container.classList.remove('copied');
+          }, 1000);
+        }).catch(function(err) {
+          console.error('Failed to copy code: ', err);
+        });
+      }
+    });
+  });
+});
+</script>
+
 <!-- end custom head snippets -->

@@ -18,12 +18,24 @@ div.highlighter-rouge, figure.highlight {
     right: 0;
     padding: 0.5em;
     background-color: $lighter-gray;
-    content: "\f121";
+    content: "\f0c5";
     font-family: "Font Awesome 6 Free" !important;
     font-size: $type-size-6;
     line-height: 1;
     text-transform: none;
     speak: none;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+
+  &:hover:before {
+    background-color: darken($lighter-gray, 5%);
+  }
+
+  &.copied:before {
+    content: "\f00c";
+    background-color: #28a745;
+    color: white;
   }
 
   .highlight {
