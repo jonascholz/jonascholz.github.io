@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const container = document.getElementById('lif-architecture-diagram');
 
     // Exit if the container is not on the page
@@ -92,7 +92,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Parameter items
     const paramItems = [
         { label: 'α (decay)', color: 'blue' },
-        { label: 'w (weight)', color: 'red' },
+        { label: 'W (weight)', color: 'red' },
         { label: 'θ (threshold)', color: 'brown' }
     ];
 
@@ -147,31 +147,33 @@ document.addEventListener('DOMContentLoaded', function() {
     }));
 
     // Step function content
-    svg.appendChild(createText(stepX + 20, stepY + 60, 'def step(params, state, x):', {
-        fontSize: '12',
+    svg.appendChild(createText(stepX + 20, stepY + 60, 'def lif_step(params, state, inputs):', {
+        fontSize: '11',
         anchor: 'start',
         fontFamily: 'Courier New, monospace',
         fill: '#333'
     }));
 
     const stepLines = [
-        '    # Update membrane potential',
-        '    u = α·u[t-1] + w·x[t]',
-        '',
-        '    # Generate spike',
-        '    s = Θ(u - θ)',
-        '',
-        '    return state, s'
+        { text: 'decay = α · u[t-1]', indent: 1 },
+        { text: 'weighted = inputs @ W', indent: 1 },
+        { text: 'reset = s[t-1] · θ', indent: 1 },
+        { text: 'u = decay + weighted - reset', indent: 1 },
+        { text: 's = Θ(u - θ)', indent: 1 },
+        { text: '', indent: 0 },
+        { text: 'return LIFState(u, s)', indent: 1 }
     ];
 
     stepLines.forEach((line, i) => {
         const lineY = stepY + 85 + i * 16;
-        svg.appendChild(createText(stepX + 20, lineY, line, {
+        const indentPx = line.indent * 20; // 20px per indent level
+        const textEl = createText(stepX + 20 + indentPx, lineY, line.text, {
             fontSize: '11',
             anchor: 'start',
             fontFamily: 'Courier New, monospace',
-            fill: line.trim().startsWith('#') ? '#666' : '#333'
-        }));
+            fill: line.text.trim().startsWith('#') ? '#666' : '#333'
+        });
+        svg.appendChild(textEl);
     });
 
     // Arrow from LIF to Step function
