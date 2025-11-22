@@ -9,8 +9,8 @@ tags:
   - LIF
 ---
 
-<div style="background-color: #f0f8ff; border-left: 4px solid #4a90e2; padding: 15px; margin: 20px 0; border-radius: 4px;">
-<strong>Note:</strong> This description follows the convention of Eshraghian et al. 2023 (<a href="https://ieeexplore.ieee.org/abstract/document/10242251/" target="_blank">Training Spiking Neural Networks Using Lessons From Deep Learning</a>).
+<div class="notice--info" markdown="1">
+**Note:** This description follows the convention of Eshraghian et al. 2023 ([Training Spiking Neural Networks Using Lessons From Deep Learning](https://ieeexplore.ieee.org/abstract/document/10242251/){:target="_blank"}).
 </div>
 
 The Leaky Integrate and Fire (LIF) neuron is one of the greats. Unlike standard artifial neurons, the LIF has a state. If you know RNNs: it's the same but with a worse activation function.

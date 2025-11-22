@@ -6,6 +6,16 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
     }
 
+    // Labels (configurable via data attributes, with lowercase defaults)
+    const labels = {
+        input: container.dataset.labelInput || 'x[t]',
+        weight: container.dataset.labelWeight || 'w',
+        state: container.dataset.labelState || 'u[t]',
+        output: container.dataset.labelOutput || 's[t]',
+        prevState: container.dataset.labelPrevState || 'u[t-1]',
+        decay: container.dataset.labelDecay || 'α'
+    };
+
     // SVG dimensions
     const width = 700;
     const height = 280;
@@ -112,25 +122,25 @@ document.addEventListener('DOMContentLoaded', function() {
     const inputEndX = neuronX - neuronRadius - 5;
     svg.appendChild(createLine(inputStartX, neuronY, inputEndX, neuronY, 'purple', 2.5, true));
 
-    // Input label x[t]
-    svg.appendChild(createText(inputStartX - 25, neuronY + 5, 'x[t]', { fill: 'purple', fontSize: '20' }));
+    // Input label
+    svg.appendChild(createText(inputStartX - 25, neuronY + 5, labels.input, { fill: 'purple', fontSize: '20' }));
 
-    // Weight label w on input arrow
-    svg.appendChild(createText(inputStartX + arrowLength/2, neuronY - 18, 'w', { fill: 'red', fontSize: '18' }));
+    // Weight label on input arrow
+    svg.appendChild(createText(inputStartX + arrowLength/2, neuronY - 18, labels.weight, { fill: 'red', fontSize: '18' }));
 
     // Neuron circle
     svg.appendChild(createCircle(neuronX, neuronY, neuronRadius, '#f0f8ff', '#333', 2.5));
 
-    // Neuron label (membrane potential) u[t]
-    svg.appendChild(createText(neuronX, neuronY + 6, 'u[t]', { fill: 'ForestGreen', fontSize: '20' }));
+    // Neuron label (membrane potential)
+    svg.appendChild(createText(neuronX, neuronY + 6, labels.state, { fill: 'ForestGreen', fontSize: '20' }));
 
     // Output arrow (to right) - s[t]
     const outputStartX = neuronX + neuronRadius + 5;
     const outputEndX = neuronX + neuronRadius + arrowLength;
     svg.appendChild(createLine(outputStartX, neuronY, outputEndX, neuronY, 'orange', 2.5, true));
 
-    // Output label s[t]
-    svg.appendChild(createText(outputEndX + 30, neuronY + 5, 's[t]', { fill: 'orange', fontSize: '20' }));
+    // Output label
+    svg.appendChild(createText(outputEndX + 30, neuronY + 5, labels.output, { fill: 'orange', fontSize: '20' }));
 
     // Decay/recurrent connection (curved arrow from bottom back to neuron)
     const decayStartAngle = 70 * Math.PI / 180;  // Start from bottom-right
@@ -148,11 +158,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     svg.appendChild(createPath(pathD, 'blue', 2.5, true));
 
-    // u[t-1] label on the decay curve
-    svg.appendChild(createText(neuronX, controlY + 15, 'u[t-1]', { fill: 'ForestGreen', fontSize: '16' }));
+    // Previous state label on the decay curve
+    svg.appendChild(createText(neuronX, controlY + 15, labels.prevState, { fill: 'ForestGreen', fontSize: '16' }));
 
     // Alpha (decay) label
-    svg.appendChild(createText(neuronX - 50, controlY - 8, 'α', { fill: 'blue', fontSize: '18' }));
+    svg.appendChild(createText(neuronX - 50, controlY - 8, labels.decay, { fill: 'blue', fontSize: '18' }));
 
     // Append SVG to container
     container.appendChild(svg);
