@@ -87,18 +87,6 @@ document.addEventListener('DOMContentLoaded', function() {
         return textEl;
     }
 
-    function createSubscript(x, y, mainText, subText, options = {}) {
-        const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-        const mainEl = createText(x, y, mainText, options);
-        const subEl = createText(x + mainText.length * 6 + 2, y + 5, subText, {
-            ...options,
-            fontSize: (parseInt(options.fontSize) || 16) * 0.7 + ''
-        });
-        g.appendChild(mainEl);
-        g.appendChild(subEl);
-        return g;
-    }
-
     // Positions
     const centerY = 100;
     const neuronRadius = 40;
@@ -116,19 +104,16 @@ document.addEventListener('DOMContentLoaded', function() {
     // Arrow from X[t] to first neuron
     const arrow1StartX = inputStartX + 45;
     const arrow1EndX = neuron1X - neuronRadius - 5;
-    svg.appendChild(createLine(arrow1StartX, centerY, arrow1EndX, centerY, '#333', 2.5, 'arrowhead-black-2l'));
+    svg.appendChild(createLine(arrow1StartX, centerY, arrow1EndX, centerY, 'purple', 2.5, 'arrowhead-purple-2l'));
 
-    // W_in label
-    svg.appendChild(createText((arrow1StartX + arrow1EndX) / 2, centerY - 15, 'W', { fill: 'red', fontSize: '16' }));
-    svg.appendChild(createText((arrow1StartX + arrow1EndX) / 2 + 12, centerY - 10, 'in', { fill: 'red', fontSize: '11' }));
+    // Wᵢₙ label
+    svg.appendChild(createText((arrow1StartX + arrow1EndX) / 2, centerY - 15, 'Wᵢₙ', { fill: 'red', fontSize: '16' }));
 
     // First neuron circle
     svg.appendChild(createCircle(neuron1X, centerY, neuronRadius, '#f0f8ff', '#333', 2.5));
 
     // First neuron label U₀[t]
-    svg.appendChild(createText(neuron1X - 8, centerY + 5, 'U', { fill: 'ForestGreen', fontSize: '18' }));
-    svg.appendChild(createText(neuron1X + 6, centerY + 10, '0', { fill: 'ForestGreen', fontSize: '12' }));
-    svg.appendChild(createText(neuron1X + 18, centerY + 5, '[t]', { fill: 'ForestGreen', fontSize: '18' }));
+    svg.appendChild(createText(neuron1X, centerY + 5, 'U₀[t]', { fill: 'ForestGreen', fontSize: '18' }));
 
     // Arrow from first neuron to S₀[t]
     const spike1StartX = neuron1X + neuronRadius + 5;
@@ -136,26 +121,21 @@ document.addEventListener('DOMContentLoaded', function() {
     svg.appendChild(createLine(spike1StartX, centerY, spike1EndX, centerY, 'orange', 2.5, 'arrowhead-orange-2l'));
 
     // S₀[t] label
-    svg.appendChild(createText(spike1EndX + 25, centerY + 5, 'S', { fill: 'orange', fontSize: '18' }));
-    svg.appendChild(createText(spike1EndX + 37, centerY + 10, '0', { fill: 'orange', fontSize: '12' }));
-    svg.appendChild(createText(spike1EndX + 47, centerY + 5, '[t]', { fill: 'orange', fontSize: '18' }));
+    svg.appendChild(createText(spike1EndX + 35, centerY + 5, 'S₀[t]', { fill: 'orange', fontSize: '18' }));
 
     // Arrow from S₀[t] to second neuron
     const arrow2StartX = spike1EndX + 75;
     const arrow2EndX = neuron2X - neuronRadius - 5;
     svg.appendChild(createLine(arrow2StartX, centerY, arrow2EndX, centerY, '#333', 2.5, 'arrowhead-black-2l'));
 
-    // W_rec label
-    svg.appendChild(createText((arrow2StartX + arrow2EndX) / 2, centerY - 15, 'W', { fill: 'red', fontSize: '16' }));
-    svg.appendChild(createText((arrow2StartX + arrow2EndX) / 2 + 12, centerY - 10, 'rec', { fill: 'red', fontSize: '11' }));
+    // Wₕ label (h for hidden)
+    svg.appendChild(createText((arrow2StartX + arrow2EndX) / 2, centerY - 15, 'Wₕ', { fill: 'red', fontSize: '16' }));
 
     // Second neuron circle
     svg.appendChild(createCircle(neuron2X, centerY, neuronRadius, '#f0f8ff', '#333', 2.5));
 
     // Second neuron label U₁[t]
-    svg.appendChild(createText(neuron2X - 8, centerY + 5, 'U', { fill: 'DarkBlue', fontSize: '18' }));
-    svg.appendChild(createText(neuron2X + 6, centerY + 10, '1', { fill: 'DarkBlue', fontSize: '12' }));
-    svg.appendChild(createText(neuron2X + 18, centerY + 5, '[t]', { fill: 'DarkBlue', fontSize: '18' }));
+    svg.appendChild(createText(neuron2X, centerY + 5, 'U₁[t]', { fill: 'DarkBlue', fontSize: '18' }));
 
     // Arrow from second neuron to S₁[t]
     const spike2StartX = neuron2X + neuronRadius + 5;
@@ -163,9 +143,7 @@ document.addEventListener('DOMContentLoaded', function() {
     svg.appendChild(createLine(spike2StartX, centerY, spike2EndX, centerY, 'orange', 2.5, 'arrowhead-orange-2l'));
 
     // S₁[t] label
-    svg.appendChild(createText(spike2EndX + 25, centerY + 5, 'S', { fill: 'orange', fontSize: '18' }));
-    svg.appendChild(createText(spike2EndX + 37, centerY + 10, '1', { fill: 'orange', fontSize: '12' }));
-    svg.appendChild(createText(spike2EndX + 47, centerY + 5, '[t]', { fill: 'orange', fontSize: '18' }));
+    svg.appendChild(createText(spike2EndX + 35, centerY + 5, 'S₁[t]', { fill: 'orange', fontSize: '18' }));
 
     // Append SVG to container
     container.appendChild(svg);

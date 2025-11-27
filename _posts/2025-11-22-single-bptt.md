@@ -1,10 +1,9 @@
 ---
-title: 'Backpropagation for LIFs (WIP)'
-excerpt: "We figure out how BPTT works for LIFs (WIP)"
+title: 'Backpropagation for a single LIF'
+excerpt: "We figure out how BPTT works for a single LIF [Read more](/posts/2025/11/bptt/)<br/><img src='/assets/images/single_lif.png'>"
 date: 2025-11-22
-permalink: /posts/2025/11/bptt/
+permalink: /posts/2025/11/single-bptt/
 tags:
-  - JAX
   - SNN
   - Tutorial
   - bptt
@@ -14,7 +13,7 @@ tags:
 **Note:** Parts of this tutorial are based on the wonderful [snnTorch tutorial by Eshraghian et al.](https://snntorch.readthedocs.io/en/latest/tutorials/tutorial_5.html){:target="_blank"} However, some parts were not entirely clear to me from their tutorial so I made my own. The notation is also mostly consistent with their [2023 paper](https://ieeexplore.ieee.org/abstract/document/10242251/){:target="_blank"}.
 </div>
 
-Backpropagation through time (BPTT) is probably the most popular way of training Spiking Neural Networks. Today we will walk through some of the mathematics of the method. By the end of this article, you will be able to calculate all gradients by hand on paper if you have to.
+Backpropagation through time (BPTT) is probably the most popular way of training Spiking Neural Networks. Today we will walk through some of the mathematics of the method for a single neuron. I found that writing out the equations becomes too cumbersome when you add more layers and recurrent connections. At least for this 1-neuron setup we can calculate the gradient by hand.
 
 This post assumes familiarity with the [LIF neuron dynamics](/posts/2025/10/lif-theory/).
 
@@ -320,7 +319,7 @@ And we were able to resolve it to this:
 
 So that's all the computations for the single neuron when we disregard the reset term. Let's add that back.
 
-## The reset term
+## The reset term (optional)
 The reset term is part of $$\frac{\partial \textcolor{ForestGreen}{U[t]}}{\partial \textcolor{red}{W_{in}}}$$. As per equation \ref{eq:lif_full}, it is a term that gets subtracted from the membrane potential: $$-\textcolor{orange}{S[t-1]}\textcolor{brown}{\theta}$$.
 
 The derivative is $$\frac{\partial (-\textcolor{orange}{S[t-1]}\textcolor{brown}{\theta})}{\partial \textcolor{red}{W_{in}}}$$ and we already know how to compute it for the case of $$\textcolor{orange}{S[t]}$$. We can now extend equation \ref{eq:membrane_derivative_closed} to include the reset term:
@@ -338,71 +337,8 @@ We already know how to compute $$\frac{\partial \textcolor{orange}{S[t-1]}}{\par
 Substituting this into the full gradient, we get the complete version of equation \ref{eq:final_gradient} with the reset term included:
 
 \begin{equation}
-\frac{\partial \textcolor{olive}{E}}{\partial \textcolor{red}{W_{in}}} = \sum_{t=0}^{T} \sigma'(\textcolor{ForestGreen}{U[t]} - \textcolor{brown}{\theta}) \cdot \left[\sum_{i=1}^{t} \textcolor{blue}{\alpha}^{t-i} \textcolor{purple}{X[i]} - \textcolor{brown}{\theta} \sigma'(\textcolor{ForestGreen}{U[t-1]} - \textcolor{brown}{\theta}) \cdot \sum_{j=1}^{t-1} \textcolor{blue}{\alpha}^{t-1-j} \textcolor{purple}{X[j]}\right]
+\frac{\partial \textcolor{olive}{E}}{\partial \textcolor{red}{W_{in}}} = \sum_{t=0}^{T} \sigma'(\textcolor{ForestGreen}{U[t]} - \textcolor{brown}{\theta}) \cdot \left(\sum_{i=1}^{t} \textcolor{blue}{\alpha}^{t-i} \textcolor{purple}{X[i]} - \textcolor{brown}{\theta} \sigma'(\textcolor{ForestGreen}{U[t-1]} - \textcolor{brown}{\theta}) \cdot \sum_{j=1}^{t-1} \textcolor{blue}{\alpha}^{t-1-j} \textcolor{purple}{X[j]}\right)
 \label{eq:final_gradient_with_reset}
 \end{equation}
 
-If you are like me then this has become a complete mess to you. Henceforth let's work with the more abstract version from equation 12, which did capture the reset term on an abstract level.
-
-## Generalizing to multiple layers (WIP wtf did i do here?)
-
-Let's extend our simple neuron setup to include a second layer, as shown in [Figure 3](#fig:two_layer_network).
-
-<figure id="fig:two_layer_network">
-<div id="two-layer-network-diagram" style="width: 100%; margin: 2em auto;"></div>
-<figcaption><strong>Figure 3:</strong> Two-layer network showing the weight transport problem. The first neuron (U₀[t]) produces spikes S₀[t] that connect to the second neuron (U₁[t]) through weight W<sub>rec</sub>, which then produces the final spike output S₁[t].</figcaption>
-</figure>
-
-<script src="{{ '/assets/js/two-layer-diagram.js' | relative_url }}"></script>
-
-Unfortunately we have to index our neurons now. As a computer scientist I am unable to use anything but $$0$$ for the first neuron and subscript $$1$$ for the second. 
-
-Now our equation is much the same as it was, but there's some additional parts. Our goal is still to find the gradient for $$\textcolor{red}{W_{in}}$$ and I will outline the path here:
-
-$$ \Delta \textcolor{red}{W_{in}} = \frac{\partial \textcolor{olive}{E}}{\partial \textcolor{red}{W_{in}}}$$
-
-
-We used to have
-
-
-$$ \Delta \textcolor{red}{W_{in}} = \frac{\partial \textcolor{olive}{E}}{\partial \textcolor{orange}{S_0[t]}} \frac{\partial \textcolor{orange}{S_0[t]}}{\partial \textcolor{red}{W_{in}}}$$
-
-
-Now $$\frac{\partial \textcolor{olive}{E}}{\partial \textcolor{orange}{S_0[t]}}$$ depends on the spikes of the layer before 
-
-
-$$ \Delta \textcolor{red}{W_{in}} = \frac{\partial \textcolor{olive}{E}}{\partial \textcolor{orange}{S_1[t]}} \frac{\partial \textcolor{orange}{S_1[t]}}{\partial \textcolor{orange}{S_0[t]}} \frac{\partial \textcolor{orange}{S_0[t]}}{\partial \textcolor{red}{W_{in}}}$$
-
-
-The last term $$\frac{\partial \textcolor{orange}{S_0[t]}}{\partial \textcolor{red}{W_{in}}}$$ is one that we already derived above. We also kind of know $$\frac{\partial \textcolor{olive}{E}}{\partial \textcolor{orange}{S_1[t]}}$$ because it's the same as we did for $$\textcolor{orange}{S_0[t]}$$ just with the spikes of the second layer instead of the first.
-
-All that's left is $$\frac{\partial \textcolor{orange}{S_1[t]}}{\partial \textcolor{orange}{S_0[t]}}$$. The second LIF's spike activation and derivative are identical to the first except for indices
-
-\begin{equation}
-\textcolor{orange}{S_1[t]} = \Theta(\textcolor{ForestGreen}{U_1[t]} - \textcolor{brown}{\theta})
-\label{eq:second_spike_function}
-\end{equation}
-
-\begin{equation}
-\frac{\partial \textcolor{orange}{S_1[t]}}{\partial \textcolor{orange}{S_0[t]}} = \sigma'(\textcolor{ForestGreen}{U_1[t]} - \textcolor{brown}{\theta}) \cdot \frac{\partial \textcolor{ForestGreen}{U_1[t]}}{\partial \textcolor{orange}{S_0[t]}}
-\label{eq:second_spike_function_derivative}
-\end{equation}
-
-
-So now we just need to resolve $$\textcolor{ForestGreen}{U_1[t]}$$ and its derivative and we are done
-
-
-\begin{equation}
-\textcolor{ForestGreen}{U_1[t]} = \textcolor{blue}{\alpha} \textcolor{ForestGreen}{U_1[t-1]} + \textcolor{red}{W_{rec}} \textcolor{orange}{S_0[t]}
-\label{eq:second_membrane_potential}
-\end{equation}
-
-
-\begin{equation}
-\frac{\partial \textcolor{ForestGreen}{U_1[t]}}{\partial \textcolor{orange}{S_0[t]}} = \textcolor{blue}{\alpha} \frac{\partial \textcolor{ForestGreen}{U_1[t-1]}}{\partial \textcolor{orange}{S_0[t]}} + \textcolor{red}{W_{rec}}
-\label{eq:second_membrane_potential_derivative}
-\end{equation} 
-
-
-## Dealing with recurrent weights
-WIP
+If you are like me then this is starting to look messy to you. Funnily enough we probably don't need the reset term anyway. Apparently [Zenke et al.](https://direct.mit.edu/neco/article/33/4/899/97482/The-Remarkable-Robustness-of-Surrogate-Gradient), show that it is not only useless but sometimes even harmful. 
