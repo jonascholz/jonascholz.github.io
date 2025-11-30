@@ -1,5 +1,5 @@
 ---
-title: 'Backpropagation for a recurrent LIF layer'
+title: 'Backpropagation for a recurrent LIF layer WIP'
 excerpt: "We figure out how BPTT works for a recurrent LIF layer [Read more](/posts/2025/11/bptt/)<br/><img src='/assets/images/single_lif.png'>"
 date: 2025-11-22
 permalink: /posts/2025/11/recurrent-bptt/
@@ -281,84 +281,25 @@ Note that the derivative of a sum is just the sum of derivatives. Hence we only 
 \frac{\partial (\textcolor{teal}{W_{rec}} \textcolor{orange}{S[t-1]})}{\partial \textcolor{red}{W_{in}}} = \textcolor{teal}{W_{rec}} \frac{\partial \textcolor{orange}{S[t-1]}}{\partial \textcolor{red}{W_{in}}}
 \end{equation}
 
-## The single layer view
+We can add this back into the original equation and write out all the terms, but doing that only gave me very long and unreadable expressions. Therefore I want to provide the abstract equation:
+
+\begin{equation}
+\frac{\partial \textcolor{ForestGreen}{U[t]}}{\partial \textcolor{red}{W_{in}}} = \textcolor{blue}{\alpha} \frac{\partial \textcolor{ForestGreen}{U[t-1]}}{\partial \textcolor{red}{W_{in}}} + \textcolor{purple}{X[t]} + \textcolor{teal}{W_{rec}} \frac{\partial \textcolor{orange}{S[t-1]}}{\partial \textcolor{red}{W_{in}}} - \textcolor{brown}{\theta} \frac{\partial \textcolor{orange}{S[t-1]}}{\partial \textcolor{red}{W_{in}}}
+\label{eq:u_derivative_abstract_with_reset}
+\end{equation}
+
+And that's basically it. Equation 8 showed us how to resolve partial s[t] / w_in. the derivative of partial u[t-1] / partial w_in can be resolved recursively with Equation 19. It just takes some recursion and a lot of patience, or an autodiff framework of your choice.
+
+## Derivative of recurrent weights
 WIP
 
-## fuck it, let me write this from scratch
+## Derivative of threshold
+WIP
 
-\begin{equation}
-\frac{\partial \textcolor{olive}{E}}{\partial \textcolor{red}{W_{in}}} = \frac{\partial \textcolor{olive}{E}}{\partial \textcolor{green}{\hat{y}}} \cdot \sum_{t=0}^T \left[\frac{\partial \textcolor{orange}{S[t]}}{\partial \textcolor{ForestGreen}{U[t]}} \cdot \frac{\partial \textcolor{ForestGreen}{U[t]}}{\partial \textcolor{red}{W_{in}}}\right]
-\end{equation}
+## The single layer view
+When you think about it, any neural network can be seen as a single layer, where only particular neurons connect. We draw it in a feed-forward layout, but we could draw all the neurons in a vertical stack if we wanted to. There are only two key differences then: 1) Most of the possible connections are not formed 2) There is a 1-timestep delay whenever we propagate from one layer to another. This single layer view is shown in the figure below.
 
-
-\begin{equation}
-\textcolor{ForestGreen}{U[t]} = \textcolor{blue}{\alpha} \textcolor{ForestGreen}{U[t-1]} + \textcolor{red}{W_{in}} \textcolor{purple}{X[t]} + \textcolor{teal}{W_{rec}}\textcolor{orange}{S[t-1]} - \textcolor{orange}{S[t-1]} \textcolor{brown}{\theta}
-\label{eq:lif_full_with_rec_repeat}
-\end{equation}
-
-
-\begin{equation}
-\frac{\partial \textcolor{ForestGreen}{U[t]}}{\partial \textcolor{red}{W_{in}}} = \textcolor{blue}{\alpha} \frac{\partial \textcolor{ForestGreen}{U[t-1]}}{\partial \textcolor{red}{W_{in}}} + \textcolor{purple}{X[t]} + \textcolor{teal}{W_{rec}} \frac{\partial \textcolor{orange}{S[t-1]}}{\partial \textcolor{red}{W_{in}}} -  \frac{\partial \textcolor{orange}{S[t-1]}}{\partial \textcolor{red}{W_{in}}} \textcolor{brown}{\theta}
-\label{eq:u_derivative_with_rec_abstract}
-\end{equation}
-
-\begin{equation}
-\frac{\partial \textcolor{ForestGreen}{U[t]}}{\partial \textcolor{red}{W_{in}}} = \textcolor{blue}{\alpha} \frac{\partial \textcolor{ForestGreen}{U[t-1]}}{\partial \textcolor{red}{W_{in}}} + \textcolor{purple}{X[t]} + \textcolor{teal}{W_{rec}} \frac{\partial \textcolor{orange}{S[t-1]}}{\partial \textcolor{ForestGreen}{U[t-1]}} \frac{\partial \textcolor{ForestGreen}{U[t-1]}}{\partial \textcolor{red}{W_{in}}} - \textcolor{brown}{\theta} \frac{\partial \textcolor{orange}{S[t-1]}}{\partial \textcolor{ForestGreen}{U[t-1]}} \frac{\partial \textcolor{ForestGreen}{U[t-1]}}{\partial \textcolor{red}{W_{in}}}
-\label{eq:u_derivative_with_rec_expanded}
-\end{equation}
-
-\begin{equation}
-\frac{\partial \textcolor{ForestGreen}{U[t]}}{\partial \textcolor{red}{W_{in}}} = \left[\textcolor{blue}{\alpha} + \textcolor{teal}{W_{rec}} \frac{\partial \textcolor{orange}{S[t-1]}}{\partial \textcolor{ForestGreen}{U[t-1]}} - \textcolor{brown}{\theta} \frac{\partial \textcolor{orange}{S[t-1]}}{\partial \textcolor{ForestGreen}{U[t-1]}}\right] \frac{\partial \textcolor{ForestGreen}{U[t-1]}}{\partial \textcolor{red}{W_{in}}} + \textcolor{purple}{X[t]}
-\label{eq:u_derivative_with_rec_factored}
-\end{equation}
-
-\begin{equation}
-\frac{\partial \textcolor{ForestGreen}{U[t]}}{\partial \textcolor{red}{W_{in}}} = \left[\textcolor{blue}{\alpha} + (\textcolor{teal}{W_{rec}} - \textcolor{brown}{\theta}) \sigma'(\textcolor{ForestGreen}{U[t-1]} - \textcolor{brown}{\theta})\right] \frac{\partial \textcolor{ForestGreen}{U[t-1]}}{\partial \textcolor{red}{W_{in}}} + \textcolor{purple}{X[t]}
-\label{eq:u_derivative_with_rec_surrogate}
-\end{equation}
-
-Expanding $$\frac{\partial \textcolor{ForestGreen}{U[t-1]}}{\partial \textcolor{red}{W_{in}}}$$ one more step:
-
-\begin{equation}
-\frac{\partial \textcolor{ForestGreen}{U[t]}}{\partial \textcolor{red}{W_{in}}} = \left[\textcolor{blue}{\alpha} + (\textcolor{teal}{W_{rec}} - \textcolor{brown}{\theta}) \sigma'(\textcolor{ForestGreen}{U[t-1]} - \textcolor{brown}{\theta})\right] \left[\left[\textcolor{blue}{\alpha} + (\textcolor{teal}{W_{rec}} - \textcolor{brown}{\theta}) \sigma'(\textcolor{ForestGreen}{U[t-2]} - \textcolor{brown}{\theta})\right] \frac{\partial \textcolor{ForestGreen}{U[t-2]}}{\partial \textcolor{red}{W_{in}}} + \textcolor{purple}{X[t-1]}\right] + \textcolor{purple}{X[t]}
-\label{eq:u_derivative_expanded_once}
-\end{equation}
-
-Distributing the brackets:
-
-\begin{equation}
-\frac{\partial \textcolor{ForestGreen}{U[t]}}{\partial \textcolor{red}{W_{in}}} = \left[\textcolor{blue}{\alpha} + (\textcolor{teal}{W_{rec}} - \textcolor{brown}{\theta}) \sigma'(\textcolor{ForestGreen}{U[t-1]} - \textcolor{brown}{\theta})\right] \left[\textcolor{blue}{\alpha} + (\textcolor{teal}{W_{rec}} - \textcolor{brown}{\theta}) \sigma'(\textcolor{ForestGreen}{U[t-2]} - \textcolor{brown}{\theta})\right] \frac{\partial \textcolor{ForestGreen}{U[t-2]}}{\partial \textcolor{red}{W_{in}}} + \left[\textcolor{blue}{\alpha} + (\textcolor{teal}{W_{rec}} - \textcolor{brown}{\theta}) \sigma'(\textcolor{ForestGreen}{U[t-1]} - \textcolor{brown}{\theta})\right] \textcolor{purple}{X[t-1]} + \textcolor{purple}{X[t]}
-\label{eq:u_derivative_distributed}
-\end{equation}
-
-Notice how the similar bracketed terms $$\left[\textcolor{blue}{\alpha} + (\textcolor{teal}{W_{rec}} - \textcolor{brown}{\theta}) \sigma'(\textcolor{ForestGreen}{U[\cdot]} - \textcolor{brown}{\theta})\right]$$ appear repeatedly, just with different time indices. This motivates introducing a shorthand notation.
-
-## Solving the recursion
-
-To simplify notation, let's define $$\textcolor{Maroon}{\beta[t]} = \textcolor{blue}{\alpha} + (\textcolor{teal}{W_{rec}} - \textcolor{brown}{\theta}) \sigma'(\textcolor{ForestGreen}{U[t]} - \textcolor{brown}{\theta})$$. Then our equation becomes:
-
-\begin{equation}
-\frac{\partial \textcolor{ForestGreen}{U[t]}}{\partial \textcolor{red}{W_{in}}} = \textcolor{Maroon}{\beta[t-1]} \frac{\partial \textcolor{ForestGreen}{U[t-1]}}{\partial \textcolor{red}{W_{in}}} + \textcolor{purple}{X[t]}
-\label{eq:u_derivative_beta}
-\end{equation}
-
-Now let's expand this recursively, starting with the initial condition $$\frac{\partial \textcolor{ForestGreen}{U[0]}}{\partial \textcolor{red}{W_{in}}} = 0$$:
-
-$$\frac{\partial \textcolor{ForestGreen}{U[1]}}{\partial \textcolor{red}{W_{in}}} = \textcolor{Maroon}{\beta[0]} \cdot 0 + \textcolor{purple}{X[1]} = \textcolor{purple}{X[1]}$$
-
-$$\frac{\partial \textcolor{ForestGreen}{U[2]}}{\partial \textcolor{red}{W_{in}}} = \textcolor{Maroon}{\beta[1]} \frac{\partial \textcolor{ForestGreen}{U[1]}}{\partial \textcolor{red}{W_{in}}} + \textcolor{purple}{X[2]} = \textcolor{Maroon}{\beta[1]} \textcolor{purple}{X[1]} + \textcolor{purple}{X[2]}$$
-
-$$\frac{\partial \textcolor{ForestGreen}{U[3]}}{\partial \textcolor{red}{W_{in}}} = \textcolor{Maroon}{\beta[2]} \frac{\partial \textcolor{ForestGreen}{U[2]}}{\partial \textcolor{red}{W_{in}}} + \textcolor{purple}{X[3]}$$
-
-$$= \textcolor{Maroon}{\beta[2]} (\textcolor{Maroon}{\beta[1]} \textcolor{purple}{X[1]} + \textcolor{purple}{X[2]}) + \textcolor{purple}{X[3]}$$
-
-$$= \textcolor{Maroon}{\beta[2]\beta[1]} \textcolor{purple}{X[1]} + \textcolor{Maroon}{\beta[2]} \textcolor{purple}{X[2]} + \textcolor{purple}{X[3]}$$
-
-The pattern becomes clear. In general:
-
-\begin{equation}
-\frac{\partial \textcolor{ForestGreen}{U[t]}}{\partial \textcolor{red}{W_{in}}} = \sum_{i=1}^{t} \left(\prod_{j=i}^{t-1} \textcolor{Maroon}{\beta[j]}\right) \textcolor{purple}{X[i]}
-\label{eq:u_derivative_pattern}
-\end{equation}
-
-where the product $$\prod_{j=i}^{t-1} \textcolor{Maroon}{\beta[j]} = \textcolor{Maroon}{\beta[t-1]\beta[t-2]\cdots\beta[i]}$$, and by convention, the product is 1 when $$i = t$$.
+<figure id="fig:single_layer_view">
+<img src="{{ '/assets/images/single-layer-view.png' | relative_url }}" alt="Single layer view of neural network" style="width: 100%; max-width: 700px; margin: 2em auto; display: block;">
+<figcaption><strong>Figure 5:</strong> Single layer view showing how a multi-layer feedforward network (left) can be equivalently viewed as a single recurrent layer (right) with specific connection patterns and time delays.</figcaption>
+</figure>
