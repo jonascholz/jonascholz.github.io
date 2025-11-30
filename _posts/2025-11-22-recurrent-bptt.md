@@ -1,8 +1,8 @@
 ---
-title: 'Backpropagation for a single LIF'
-excerpt: "We figure out how BPTT works for a single LIF [Read more](/posts/2025/11/bptt/)<br/><img src='/assets/images/single_lif.png'>"
+title: 'Backpropagation for a recurrent LIF layer'
+excerpt: "We figure out how BPTT works for a recurrent LIF layer [Read more](/posts/2025/11/bptt/)<br/><img src='/assets/images/single_lif.png'>"
 date: 2025-11-22
-permalink: /posts/2025/11/single-bptt/
+permalink: /posts/2025/11/recurrent-bptt/
 tags:
   - SNN
   - Tutorial
@@ -115,106 +115,11 @@ We can estimate the derivative of the heaviside function with the dirac delta fu
 Instead we use a surrogate gradient function. Intuitively you can think of it like pretending we used a smooth activation function and taking its derivative. The trick is that we didn't actually use a smooth activation function for the forward-pass, but it turns out that the gradient is still useful, even if it didn't come from our original function. You can see this trick in [Figure 2](#fig:surrogate_gradient).
 
 <figure id="fig:surrogate_gradient">
-<div id="surrogate-gradient-plot" style="width:100%; height:400px;"></div>
+<div id="surrogate-gradient-plot" style="width: 100%; margin: 2em auto;"></div>
 <figcaption><strong>Figure 2:</strong> Surrogate gradient concept showing the Heaviside function (left, solid) and its smooth sigmoid approximation (left, dashed), along with their derivatives (right). The Heaviside derivative is the Dirac delta (spike at zero), while the sigmoid derivative provides a smooth, trainable gradient. Note this may not be a technically accurate representation of the Dirac delta.</figcaption>
 </figure>
 
-<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const sigmoidColor = '#1f77b4'; // Muted blue
-    const heavisideColor = '#ff7f0e'; // Safety orange
-
-    // Generate data
-    const x = [];
-    for (let i = -5; i <= 5; i += 0.1) {
-        x.push(i);
-    }
-
-    // Left plot data
-    const y_heaviside = x.map(val => val < 0 ? 0 : 1);
-    const y_sigmoid = x.map(val => 1 / (1 + Math.exp(-val)));
-
-    // Right plot data
-    const y_sigmoid_deriv = y_sigmoid.map(val => val * (1 - val));
-
-    // Traces for the left plot
-    const trace_heaviside = {
-        x: x,
-        y: y_heaviside,
-        mode: 'lines',
-        name: 'Heaviside (Θ)',
-        line: { color: heavisideColor, width: 3 },
-        showlegend: false
-    };
-
-    const trace_sigmoid = {
-        x: x,
-        y: y_sigmoid,
-        mode: 'lines',
-        name: 'Sigmoid (σ, Surrogate)',
-        line: { color: sigmoidColor, dash: 'dash', width: 3 },
-        showlegend: false
-    };
-
-    // Traces for the right plot
-    const trace_dirac = {
-        x: [0, 0],
-        y: [0, 1], // Representing Dirac as a spike of height 1
-        mode: 'lines',
-        name: 'Dirac Delta (δ)',
-        xaxis: 'x2',
-        yaxis: 'y2',
-        line: { color: heavisideColor, width: 3 }
-    };
-
-    const trace_sigmoid_deriv = {
-        x: x,
-        y: y_sigmoid_deriv,
-        mode: 'lines',
-        name: 'Sigmoid Derivative (σ′)',
-        xaxis: 'x2',
-        yaxis: 'y2',
-        line: { color: sigmoidColor, dash: 'dash', width: 3 }
-    };
-
-    const layout = {
-        title: 'Surrogate Gradient Concept',
-        xaxis: {
-            domain: [0, 0.45],
-            title: 'x',
-            zeroline: true
-        },
-        yaxis: {
-            title: 'f(x)',
-            range: [-0.1, 1.1]
-        },
-        xaxis2: {
-            domain: [0.55, 1],
-            title: 'x',
-            zeroline: true
-        },
-        yaxis2: {
-            anchor: 'x2',
-            title: 'f\'(x)',
-            range: [-0.1, 1.1]
-        },
-        legend: {
-            x: 1.02,
-            xanchor: 'left',
-            y: 0.5,
-            yanchor: 'middle',
-            orientation: 'v'
-        },
-        margin: {
-            b: 100,
-            r: 150
-        }
-    };
-
-    Plotly.newPlot('surrogate-gradient-plot', [trace_heaviside, trace_sigmoid, trace_dirac, trace_sigmoid_deriv], layout);
-});
-</script>
+<script src="{{ '/assets/js/surrogate-gradient-plot.js' | relative_url }}"></script>
 
 Let's use the sigmoid derivative as our surrogate gradient function, i.e., $$\frac{\partial \Theta (\textcolor{ForestGreen}{U[t]} - \textcolor{brown}{\theta})}{\partial (\textcolor{ForestGreen}{U[t]} - \textcolor{brown}{\theta})} \approx \sigma'(\textcolor{ForestGreen}{U[t]} - \textcolor{brown}{\theta})$$. We will treat it as a known quantity. $$\textcolor{brown}{\theta}$$ is just a constant and $$\textcolor{ForestGreen}{U[t]}$$ is known at time $$t$$ so we now know the left side of equation 8. All that's left is $$\frac{\partial \textcolor{ForestGreen}{U[t]}}{\partial \textcolor{red}{W_{in}}}$$.
 
@@ -342,3 +247,118 @@ Substituting this into the full gradient, we get the complete version of equatio
 \end{equation}
 
 If you are like me then this is starting to look messy to you. Funnily enough we probably don't need the reset term anyway. Apparently [Zenke et al.](https://direct.mit.edu/neco/article/33/4/899/97482/The-Remarkable-Robustness-of-Surrogate-Gradient), show that it is not only useless but sometimes even harmful. 
+
+## The vector view
+We can also interpret this notation differently: $$\textcolor{ForestGreen}{U[t]}$$ is a vector of membrane potentials. $$\textcolor{red}{W_{in}}$$ is a matrix of input weights. $$\textcolor{blue}{\alpha}$$, $$\textcolor{brown}{\theta}$$, $$\textcolor{purple}{X[t]}$$ and $$\textcolor{orange}{S[t]}$$ all are vectors, too. In this view, everything still works out exactly them same, except some multiplications are actually element-wise products and others are dot products. This view is shown in the figure below.
+
+<figure id="fig:multi_neuron_diagram">
+<div id="multi-lif-neuron-diagram" style="width: 100%; margin: 2em auto;"></div>
+<figcaption><strong>Figure 3:</strong> Vector view with 3 LIF neurons. Multiple inputs X[t] (X₀[t], X₁[t], X₂[t]) fully connect to all neurons via weight matrix W<sub>in</sub>. Each neuron has its own membrane potential U[t] (U₀[t], U₁[t], U₂[t]) and produces spikes S[t] (S₀[t], S₁[t], S₂[t]).</figcaption>
+</figure>
+
+<script src="{{ '/assets/js/multi-lif-diagram.js' | relative_url }}"></script>
+
+## Adding recurrent weights
+Let's add another term to account for spikes coming from other neurons in the same layer so they can influence each other.
+
+\begin{equation}
+\textcolor{ForestGreen}{U[t]} = \textcolor{blue}{\alpha} \textcolor{ForestGreen}{U[t-1]} + \textcolor{red}{W_{in}} \textcolor{purple}{X[t]} + \underbrace{\textcolor{teal}{W_{rec}}\textcolor{orange}{S[t-1]}}_{\text{recurrent spikes}} - \textcolor{orange}{S[t-1]} \textcolor{brown}{\theta}
+\label{eq:lif_full_with_rec}
+\end{equation}
+
+where $$\textcolor{teal}{W_{rec}}$$ is the recurrent weight matrix connecting neuron outputs back to neuron inputs. This is shown in the figure below.
+
+<figure id="fig:recurrent_neuron_diagram">
+<div id="recurrent-lif-neuron-diagram" style="width: 100%; margin: 2em auto;"></div>
+<figcaption><strong>Figure 4:</strong> Vector view with recurrent connections. In addition to the input weights W<sub>in</sub>, each neuron's output S[t-1] connects back to all neurons via the recurrent weight matrix W<sub>rec</sub> (weird green-blue color). The curved connections show the fully recurrent connectivity.</figcaption>
+</figure>
+
+<script src="{{ '/assets/js/recurrent-lif-diagram.js' | relative_url }}"></script>
+
+Note that the derivative of a sum is just the sum of derivatives. Hence we only need to find the derivative of this additional term and add it to the derivative we came up with previously. The term we have to differentiate is $$\frac{\partial (\textcolor{teal}{W_{rec}} \textcolor{orange}{S[t-1]})}{\partial \textcolor{red}{W_{in}}}$$ but notice that $$\frac{\partial \textcolor{teal}{W_{rec}}}{\partial \textcolor{red}{W_{in}}} = 0$$, i.e., it's constant w.r.t. $$\textcolor{red}{W_{in}}$$. Thus
+
+\begin{equation}
+\frac{\partial (\textcolor{teal}{W_{rec}} \textcolor{orange}{S[t-1]})}{\partial \textcolor{red}{W_{in}}} = \textcolor{teal}{W_{rec}} \frac{\partial \textcolor{orange}{S[t-1]}}{\partial \textcolor{red}{W_{in}}}
+\end{equation}
+
+## The single layer view
+WIP
+
+## fuck it, let me write this from scratch
+
+\begin{equation}
+\frac{\partial \textcolor{olive}{E}}{\partial \textcolor{red}{W_{in}}} = \frac{\partial \textcolor{olive}{E}}{\partial \textcolor{green}{\hat{y}}} \cdot \sum_{t=0}^T \left[\frac{\partial \textcolor{orange}{S[t]}}{\partial \textcolor{ForestGreen}{U[t]}} \cdot \frac{\partial \textcolor{ForestGreen}{U[t]}}{\partial \textcolor{red}{W_{in}}}\right]
+\end{equation}
+
+
+\begin{equation}
+\textcolor{ForestGreen}{U[t]} = \textcolor{blue}{\alpha} \textcolor{ForestGreen}{U[t-1]} + \textcolor{red}{W_{in}} \textcolor{purple}{X[t]} + \textcolor{teal}{W_{rec}}\textcolor{orange}{S[t-1]} - \textcolor{orange}{S[t-1]} \textcolor{brown}{\theta}
+\label{eq:lif_full_with_rec_repeat}
+\end{equation}
+
+
+\begin{equation}
+\frac{\partial \textcolor{ForestGreen}{U[t]}}{\partial \textcolor{red}{W_{in}}} = \textcolor{blue}{\alpha} \frac{\partial \textcolor{ForestGreen}{U[t-1]}}{\partial \textcolor{red}{W_{in}}} + \textcolor{purple}{X[t]} + \textcolor{teal}{W_{rec}} \frac{\partial \textcolor{orange}{S[t-1]}}{\partial \textcolor{red}{W_{in}}} -  \frac{\partial \textcolor{orange}{S[t-1]}}{\partial \textcolor{red}{W_{in}}} \textcolor{brown}{\theta}
+\label{eq:u_derivative_with_rec_abstract}
+\end{equation}
+
+\begin{equation}
+\frac{\partial \textcolor{ForestGreen}{U[t]}}{\partial \textcolor{red}{W_{in}}} = \textcolor{blue}{\alpha} \frac{\partial \textcolor{ForestGreen}{U[t-1]}}{\partial \textcolor{red}{W_{in}}} + \textcolor{purple}{X[t]} + \textcolor{teal}{W_{rec}} \frac{\partial \textcolor{orange}{S[t-1]}}{\partial \textcolor{ForestGreen}{U[t-1]}} \frac{\partial \textcolor{ForestGreen}{U[t-1]}}{\partial \textcolor{red}{W_{in}}} - \textcolor{brown}{\theta} \frac{\partial \textcolor{orange}{S[t-1]}}{\partial \textcolor{ForestGreen}{U[t-1]}} \frac{\partial \textcolor{ForestGreen}{U[t-1]}}{\partial \textcolor{red}{W_{in}}}
+\label{eq:u_derivative_with_rec_expanded}
+\end{equation}
+
+\begin{equation}
+\frac{\partial \textcolor{ForestGreen}{U[t]}}{\partial \textcolor{red}{W_{in}}} = \left[\textcolor{blue}{\alpha} + \textcolor{teal}{W_{rec}} \frac{\partial \textcolor{orange}{S[t-1]}}{\partial \textcolor{ForestGreen}{U[t-1]}} - \textcolor{brown}{\theta} \frac{\partial \textcolor{orange}{S[t-1]}}{\partial \textcolor{ForestGreen}{U[t-1]}}\right] \frac{\partial \textcolor{ForestGreen}{U[t-1]}}{\partial \textcolor{red}{W_{in}}} + \textcolor{purple}{X[t]}
+\label{eq:u_derivative_with_rec_factored}
+\end{equation}
+
+\begin{equation}
+\frac{\partial \textcolor{ForestGreen}{U[t]}}{\partial \textcolor{red}{W_{in}}} = \left[\textcolor{blue}{\alpha} + (\textcolor{teal}{W_{rec}} - \textcolor{brown}{\theta}) \sigma'(\textcolor{ForestGreen}{U[t-1]} - \textcolor{brown}{\theta})\right] \frac{\partial \textcolor{ForestGreen}{U[t-1]}}{\partial \textcolor{red}{W_{in}}} + \textcolor{purple}{X[t]}
+\label{eq:u_derivative_with_rec_surrogate}
+\end{equation}
+
+Expanding $$\frac{\partial \textcolor{ForestGreen}{U[t-1]}}{\partial \textcolor{red}{W_{in}}}$$ one more step:
+
+\begin{equation}
+\frac{\partial \textcolor{ForestGreen}{U[t]}}{\partial \textcolor{red}{W_{in}}} = \left[\textcolor{blue}{\alpha} + (\textcolor{teal}{W_{rec}} - \textcolor{brown}{\theta}) \sigma'(\textcolor{ForestGreen}{U[t-1]} - \textcolor{brown}{\theta})\right] \left[\left[\textcolor{blue}{\alpha} + (\textcolor{teal}{W_{rec}} - \textcolor{brown}{\theta}) \sigma'(\textcolor{ForestGreen}{U[t-2]} - \textcolor{brown}{\theta})\right] \frac{\partial \textcolor{ForestGreen}{U[t-2]}}{\partial \textcolor{red}{W_{in}}} + \textcolor{purple}{X[t-1]}\right] + \textcolor{purple}{X[t]}
+\label{eq:u_derivative_expanded_once}
+\end{equation}
+
+Distributing the brackets:
+
+\begin{equation}
+\frac{\partial \textcolor{ForestGreen}{U[t]}}{\partial \textcolor{red}{W_{in}}} = \left[\textcolor{blue}{\alpha} + (\textcolor{teal}{W_{rec}} - \textcolor{brown}{\theta}) \sigma'(\textcolor{ForestGreen}{U[t-1]} - \textcolor{brown}{\theta})\right] \left[\textcolor{blue}{\alpha} + (\textcolor{teal}{W_{rec}} - \textcolor{brown}{\theta}) \sigma'(\textcolor{ForestGreen}{U[t-2]} - \textcolor{brown}{\theta})\right] \frac{\partial \textcolor{ForestGreen}{U[t-2]}}{\partial \textcolor{red}{W_{in}}} + \left[\textcolor{blue}{\alpha} + (\textcolor{teal}{W_{rec}} - \textcolor{brown}{\theta}) \sigma'(\textcolor{ForestGreen}{U[t-1]} - \textcolor{brown}{\theta})\right] \textcolor{purple}{X[t-1]} + \textcolor{purple}{X[t]}
+\label{eq:u_derivative_distributed}
+\end{equation}
+
+Notice how the similar bracketed terms $$\left[\textcolor{blue}{\alpha} + (\textcolor{teal}{W_{rec}} - \textcolor{brown}{\theta}) \sigma'(\textcolor{ForestGreen}{U[\cdot]} - \textcolor{brown}{\theta})\right]$$ appear repeatedly, just with different time indices. This motivates introducing a shorthand notation.
+
+## Solving the recursion
+
+To simplify notation, let's define $$\textcolor{Maroon}{\beta[t]} = \textcolor{blue}{\alpha} + (\textcolor{teal}{W_{rec}} - \textcolor{brown}{\theta}) \sigma'(\textcolor{ForestGreen}{U[t]} - \textcolor{brown}{\theta})$$. Then our equation becomes:
+
+\begin{equation}
+\frac{\partial \textcolor{ForestGreen}{U[t]}}{\partial \textcolor{red}{W_{in}}} = \textcolor{Maroon}{\beta[t-1]} \frac{\partial \textcolor{ForestGreen}{U[t-1]}}{\partial \textcolor{red}{W_{in}}} + \textcolor{purple}{X[t]}
+\label{eq:u_derivative_beta}
+\end{equation}
+
+Now let's expand this recursively, starting with the initial condition $$\frac{\partial \textcolor{ForestGreen}{U[0]}}{\partial \textcolor{red}{W_{in}}} = 0$$:
+
+$$\frac{\partial \textcolor{ForestGreen}{U[1]}}{\partial \textcolor{red}{W_{in}}} = \textcolor{Maroon}{\beta[0]} \cdot 0 + \textcolor{purple}{X[1]} = \textcolor{purple}{X[1]}$$
+
+$$\frac{\partial \textcolor{ForestGreen}{U[2]}}{\partial \textcolor{red}{W_{in}}} = \textcolor{Maroon}{\beta[1]} \frac{\partial \textcolor{ForestGreen}{U[1]}}{\partial \textcolor{red}{W_{in}}} + \textcolor{purple}{X[2]} = \textcolor{Maroon}{\beta[1]} \textcolor{purple}{X[1]} + \textcolor{purple}{X[2]}$$
+
+$$\frac{\partial \textcolor{ForestGreen}{U[3]}}{\partial \textcolor{red}{W_{in}}} = \textcolor{Maroon}{\beta[2]} \frac{\partial \textcolor{ForestGreen}{U[2]}}{\partial \textcolor{red}{W_{in}}} + \textcolor{purple}{X[3]}$$
+
+$$= \textcolor{Maroon}{\beta[2]} (\textcolor{Maroon}{\beta[1]} \textcolor{purple}{X[1]} + \textcolor{purple}{X[2]}) + \textcolor{purple}{X[3]}$$
+
+$$= \textcolor{Maroon}{\beta[2]\beta[1]} \textcolor{purple}{X[1]} + \textcolor{Maroon}{\beta[2]} \textcolor{purple}{X[2]} + \textcolor{purple}{X[3]}$$
+
+The pattern becomes clear. In general:
+
+\begin{equation}
+\frac{\partial \textcolor{ForestGreen}{U[t]}}{\partial \textcolor{red}{W_{in}}} = \sum_{i=1}^{t} \left(\prod_{j=i}^{t-1} \textcolor{Maroon}{\beta[j]}\right) \textcolor{purple}{X[i]}
+\label{eq:u_derivative_pattern}
+\end{equation}
+
+where the product $$\prod_{j=i}^{t-1} \textcolor{Maroon}{\beta[j]} = \textcolor{Maroon}{\beta[t-1]\beta[t-2]\cdots\beta[i]}$$, and by convention, the product is 1 when $$i = t$$.
