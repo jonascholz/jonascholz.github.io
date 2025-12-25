@@ -1,6 +1,6 @@
 ---
 layout: archive
-title: "CV"
+title: ""
 permalink: /cv/
 author_profile: true
 redirect_from:
@@ -9,7 +9,13 @@ redirect_from:
 
 {% include base_path %}
 
-Recently my work has been in the field of Neuromorphic Computing, but I work on anything that may lead to smarter AI. Prior to this I was a Software Developer, working in typical SCRUM teams or whatever the project required. I manage my code in Git and try to find scalable solutions whenever possible.
+<div style="display: flex; align-items: flex-start; gap: 2em; margin: 2em 0;">
+  <img src="{{ base_path }}/images/profile.jpg" alt="Jona Scholz" style="border-radius: 8px; width: 200px; height: 200px; object-fit: cover; flex-shrink: 0;">
+  <div>
+    <h1 style="margin-top: 0;">Hi, I'm Jona</h1>
+    <p>Recently my work has been in the field of Neuromorphic Computing, but I work on anything that may lead to AGI. Prior to this I was a Software Developer, working in typical SCRUM teams or whatever the project required. I manage my code in Git and try to find scalable solutions whenever possible.</p>
+  </div>
+</div>
 
 Education
 ======
@@ -200,11 +206,11 @@ Skills
 
 
 
-Publications
+<!-- Publications
 ======
 <ul>{% for post in site.publications reversed %}
   {% include archive-single-cv.html %}
-{% endfor %}</ul>
+{% endfor %}</ul> -->
 
 <!-- Talks
 ======

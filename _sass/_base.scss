@@ -109,6 +109,27 @@ blockquote {
   }
 }
 
+/* details/summary */
+
+details {
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 10px;
+  margin: 15px 0;
+
+  summary {
+    cursor: pointer;
+    color: #666;
+    font-style: italic;
+    padding: 0.5em 0;
+
+    &:hover {
+      color: #333;
+    }
+  }
+}
+
 /* links */
 
 a {

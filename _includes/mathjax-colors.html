@@ -1,0 +1,37 @@
+<!--
+  COLOR PALETTE - Single source of truth for equation colors
+  Include this at the top of posts that need colored equations
+-->
+<style>
+:root {
+  --math-color-x: purple;
+  --math-color-w: red;
+  --math-color-b: blue;
+  --math-color-y: orange;
+  --math-color-n: green;
+}
+</style>
+
+<!-- MathJax macros -->
+{% raw %}
+$$
+% Basic colors (used in SNN initialization post)
+\newcommand{\cx}[1]{{\color{purple}#1}}
+\newcommand{\cw}[1]{{\color{red}#1}}
+\newcommand{\cb}[1]{{\color{blue}#1}}
+\newcommand{\cy}[1]{{\color{orange}#1}}
+\newcommand{\cn}[1]{{\color{green}#1}}
+
+% Extended colors (used in BPTT post)
+\newcommand{\cU}[1]{{\color{ForestGreen}#1}}
+\newcommand{\cS}[1]{{\color{orange}#1}}
+\newcommand{\cX}[1]{{\color{purple}#1}}
+\newcommand{\cWin}[1]{{\color{red}#1}}
+\newcommand{\cWrec}[1]{{\color{teal}#1}}
+\newcommand{\calpha}[1]{{\color{blue}#1}}
+\newcommand{\ctheta}[1]{{\color{brown}#1}}
+\newcommand{\cE}[1]{{\color{olive}#1}}
+\newcommand{\cyhat}[1]{{\color{green}#1}}
+\newcommand{\cytarget}[1]{{\color{magenta}#1}}
+$$
+{% endraw %}
