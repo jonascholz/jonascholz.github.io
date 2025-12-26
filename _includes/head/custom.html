@@ -37,7 +37,26 @@ MathJax.Hub.Config({
   },
   TeX: {
     equationNumbers: { autoNumber: "AMS" },
-    extensions: ["AMSmath.js", "AMSsymbols.js", "color.js"]
+    extensions: ["AMSmath.js", "AMSsymbols.js", "color.js"],
+    Macros: {
+      // Basic colors (used in He initialization post)
+      cx: ["{\\color{purple}{#1}}", 1],
+      cw: ["{\\color{red}{#1}}", 1],
+      cb: ["{\\color{blue}{#1}}", 1],
+      cy: ["{\\color{orange}{#1}}", 1],
+      cn: ["{\\color{green}{#1}}", 1],
+      // Extended colors (used in BPTT post)
+      cU: ["{\\color{ForestGreen}{#1}}", 1],
+      cS: ["{\\color{orange}{#1}}", 1],
+      cX: ["{\\color{purple}{#1}}", 1],
+      cWin: ["{\\color{red}{#1}}", 1],
+      cWrec: ["{\\color{teal}{#1}}", 1],
+      calpha: ["{\\color{blue}{#1}}", 1],
+      ctheta: ["{\\color{brown}{#1}}", 1],
+      cE: ["{\\color{olive}{#1}}", 1],
+      cyhat: ["{\\color{green}{#1}}", 1],
+      cytarget: ["{\\color{magenta}{#1}}", 1]
+    }
   },
   displayAlign: 'center',
   "HTML-CSS": {
