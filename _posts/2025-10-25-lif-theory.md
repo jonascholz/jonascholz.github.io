@@ -9,8 +9,6 @@ tags:
   - LIF
 ---
 
-{% include mathjax-colors.html %}
-
 <div class="notice--info" markdown="1">
 **Note:** This description follows the convention of Eshraghian et al. 2023 ([Training Spiking Neural Networks Using Lessons From Deep Learning](https://ieeexplore.ieee.org/abstract/document/10242251/){:target="_blank"}).
 </div>

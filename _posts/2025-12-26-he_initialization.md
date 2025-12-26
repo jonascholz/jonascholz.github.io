@@ -1,14 +1,13 @@
 ---
 title: 'A forward pass through He initialization'
 excerpt: "We go through some insights from He et al. to initialize weights. This builds the foundation for a follow-up blogposts, which analyzes the same situation for Spiking Neural Networks. [Read more](/posts/2025/12/spike-info/)<br/><img src='/assets/images/vanishing_gradients.png'>"
-date: 2025-12-21  
+date: 2025-12-26  
 permalink: /posts/2025/12/he-initialization/
 tags:
   - He Initialization
   - ANN
   - ReLU
 ---
-{% include mathjax-colors.html %}
 
 <div class="notice--info" markdown="1">
 **Note:** This post is based on the paper [Delving Deep into Rectifiers: Surpassing Human-Level Performance on ImageNet Classification](https://openaccess.thecvf.com/content_iccv_2015/html/He_Delving_Deep_into_ICCV_2015_paper.html){:target="_blank"} by He et al. (2015). My angle is a bit different, because He et al. were fixing the Glorot initialization and studying PReLU activations. I don't cover any of that.
@@ -288,4 +287,48 @@ For the final layer L, it's variance is as follows (eq11 in He et al.)
 \begin{equation}
 \text{Var}[\cy{y_L}] = \text{Var}[\cy{y_1}] \left( \prod_{l=2}^{L} \frac{1}{2}\cn{n_l} \text{Var}[\cw{w_l}]\right)
 \label{eq:variance_final_layer}
+\end{equation}
+
+And finally, we see that if the initial variance is 1 and the variance at each layer is 1, the final variance will be 1, too. He et al. formalize this condition in their eq12:
+
+\begin{equation}
+\frac{1}{2}\cn{n_l}\text{Var}[\cw{w_l}] = 1, \quad \forall l.
+\label{eq:variance_constraint}
+\end{equation}
+
+## Initializing for a stable forward pass
+We just saw a condition that keeps variance stable across all layers. Remember that we are sampling weights from a normal distribution with mean zero. We typically don't specify the variance but the standard deviation. It comes out to the following:
+
+<details>
+<summary>Deriving the variance</summary>
+
+Starting from the constraint equation:
+
+$$
+\frac{1}{2}\cn{n_l}\text{Var}[\cw{w_l}] = 1
+$$
+
+Multiply both sides by 2:
+
+$$
+\cn{n_l}\text{Var}[\cw{w_l}] = 2
+$$
+
+Divide both sides by $\cn{n_l}$:
+
+$$
+\text{Var}[\cw{w_l}] = \frac{2}{\cn{n_l}}
+$$
+
+Since we're sampling from a normal distribution, we typically specify the standard deviation, which is:
+
+$$
+\sigma[\cw{w_l}] = \sqrt{\text{Var}[\cw{w_l}]} = \sqrt{\frac{2}{\cn{n_l}}}
+$$
+
+</details>
+
+\begin{equation}
+\sigma[\cw{w_l}] = \sqrt{\frac{2}{\cn{n_l}}}
+\label{eq:he_init_std}
 \end{equation}

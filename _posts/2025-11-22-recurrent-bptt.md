@@ -9,7 +9,6 @@ tags:
   - bptt
 ---
 
-{% include mathjax-colors.html %}
 
 <div class="notice--info" markdown="1">
 **Note:** Parts of this tutorial are based on the wonderful [snnTorch tutorial by Eshraghian et al.](https://snntorch.readthedocs.io/en/latest/tutorials/tutorial_5.html){:target="_blank"} However, some parts were not entirely clear to me from their tutorial so I made my own. The notation is also mostly consistent with their [2023 paper](https://ieeexplore.ieee.org/abstract/document/10242251/){:target="_blank"}.
