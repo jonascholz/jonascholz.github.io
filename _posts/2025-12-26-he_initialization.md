@@ -1,6 +1,6 @@
 ---
-title: 'A forward pass through He initialization'
-excerpt: "We go through some insights from He et al. to initialize weights. This builds the foundation for a follow-up blogposts, which analyzes the same situation for Spiking Neural Networks. [Read more](/posts/2025/12/spike-info/)<br/><img src='/assets/images/vanishing_gradients.png'>"
+title: 'A forward pass through Kaiming/He initialization'
+excerpt: "We go through some insights from He et al. to initialize weights. This builds the foundation for a follow-up blogpost, which analyzes the same situation for Spiking Neural Networks. [Read more](/posts/2025/12/spike-info/)<br/><img src='/assets/images/vanishing_gradients.png'>"
 date: 2025-12-26  
 permalink: /posts/2025/12/he-initialization/
 tags:
@@ -54,7 +54,7 @@ $$
 \text{Var}[\cy{y_l^{(1)}}] = \text{Var}[\cy{y_l^{(2)}}] = \cdots = \text{Var}[\cy{y_l^{(d)}}]
 $$
 
-We can understand the layer's variance by understanding a single neuron's variance. In the following $$\cy{y_l}$$ stands for the weighted input sum of one particular neuron in layer $$l$$. In the they start with the equation you see below, but you can also expand the toggle to see how I think they got there.
+We can understand the layer's variance by understanding a single neuron's variance. In the following $$\cy{y_l}$$ stands for the weighted input sum of one particular neuron in layer $$l$$. In the paper, they start with the equation you see below, but you can also expand the toggle to see how I think they got there.
 
 <details>
 <summary>How they probably proceeded</summary>
@@ -101,7 +101,7 @@ $$
 
 The final term on the right looks much like the one we started with but that other term was the variance of a sum. Now we have the sum of variances. 
 
-Importantly, the variance of a weight/input pair is the same as any other because of their independence. We just have $\cn{n}$ the same variance for all input/weight pairs in the layer.
+Importantly, the variance of a weight/input pair is the same as any other because of their independence. We just have $\cn{n}$ times the same variance for all input/weight pairs in the layer.
 
 </p>
 </details>
@@ -212,10 +212,10 @@ E[\cx{x_l}^2] &= E[\cx{x_l}^2 \mid \cy{y_{l-1}} > 0] \cdot P(\cy{y_{l-1}} > 0) +
 \end{aligned}
 $$
 
-In fact, if $\cy{y_{l-1}} > 0$ then the ReLU's output is identical to its input. In other words $\cx{x_l} = \cy{y_l}$.
+In fact, if $\cy{y_{l-1}} > 0$ then the ReLU's output is identical to its input. In other words $\cx{x_l} = \cy{y_{l-1}}$.
 
 \begin{equation}
-E[\cx{x_l}^2] = E[\cy{y_l}^2 \mid \cy{y_{l-1}} > 0] \cdot P(\cy{y_{l-1}} > 0)
+E[\cx{x_l}^2] = E[\cy{y_{l-1}}^2 \mid \cy{y_{l-1}} > 0] \cdot P(\cy{y_{l-1}} > 0)
 \label{eq:xl_with_yl}
 \end{equation}
 
@@ -240,14 +240,14 @@ Now the $\cx{x_i}$ are always either zero or positive, because they pass through
 </details>
 
 \begin{equation}
-E[\cx{x_l}^2] = E[\cy{y_l}^2 \mid \cy{y_{l-1}} > 0] \cdot \frac{1}{2}
+E[\cx{x_l}^2] = E[\cy{y_{l-1}}^2 \mid \cy{y_{l-1}} > 0] \cdot \frac{1}{2}
 \label{eq:xl_half_probability}
 \end{equation}
 
-Now it turns out we can get rid of the conditional with a simple trick. However, forget about everything we just did and just consider $E[\cy{y_l}^2]$ in isolation. By the law of total expectation, we could partition that thing into cases where $\cy{y_l}$ is either greater than zero or less than zero. If it were zero, it wouldn't change the expectation in any way.
+Now it turns out we can get rid of the conditional with a simple trick. However, forget about everything we just did and just consider $E[\cy{y_{l-1}}^2]$ in isolation. By the law of total expectation, we could partition that thing into cases where $\cy{y_{l-1}}$ is either greater than zero or less than zero. If it were zero, it wouldn't change the expectation in any way.
 
 $$
-E[\cy{y_l}^2] = \underbrace{E[\cy{y_l}^2 \mid \cy{y_l} > 0]}_{A} \cdot \frac{1}{2} + \underbrace{E[\cy{y_l}^2 \mid \cy{y_l} < 0]}_{A} \cdot \frac{1}{2}
+E[\cy{y_{l-1}}^2] = \underbrace{E[\cy{y_{l-1}}^2 \mid \cy{y_{l-1}} > 0]}_{A} \cdot \frac{1}{2} + \underbrace{E[\cy{y_{l-1}}^2 \mid \cy{y_{l-1}} < 0]}_{A} \cdot \frac{1}{2}
 $$
 
 Because of the symmetry both cases have the same expected value A. In turn, the equation has the form
@@ -267,7 +267,7 @@ E[\cy{y}^2] = E[\cy{y_{l-1}}^2 \mid \cy{y_{l-1}} > 0]
 And substituting back into the original we find that
 
 \begin{equation}
-E[\cx{x_l}^2] = E[\cy{y_l}^2] \cdot \frac{1}{2}
+E[\cx{x_l}^2] = E[\cy{y_{l-1}}^2] \cdot \frac{1}{2}
 \label{eq:xl_final_form}
 \end{equation}
 
@@ -282,7 +282,7 @@ The resolved equation (eq10 in the He et al. paper) looks like this:
 
 So we have finally broken the variance down to $\cn{n_l}$, which we choose, $\text{Var}[\cw{w_l}]$ which we choose as well and $\text{Var}[\cy{y_{l-1}}]$ which we can resolve recursively. In fact, let's do that right now!
 
-For the final layer L, it's variance is as follows (eq11 in He et al.)
+For the final layer L, its variance is as follows (eq11 in He et al.)
 
 \begin{equation}
 \text{Var}[\cy{y_L}] = \text{Var}[\cy{y_1}] \left( \prod_{l=2}^{L} \frac{1}{2}\cn{n_l} \text{Var}[\cw{w_l}]\right)

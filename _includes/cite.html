@@ -1,0 +1,1 @@
+{%- for ref in page.references -%}{%- if ref.id == include.key -%}<a href="#ref-{{ ref.id }}" class="citation">[{{ forloop.index }}]</a>{%- endif -%}{%- endfor -%}
