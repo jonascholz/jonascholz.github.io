@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const plotDiv = document.getElementById('lif-gradient-plot');
     const sweepDiv = document.getElementById('lif-sweep-plot');
     const outputDiv = document.getElementById('lif-output-plot');
@@ -25,6 +25,17 @@ document.addEventListener('DOMContentLoaded', function() {
         return height * (1 - Math.abs(x) / width);
     }
 
+    function boxcarDerivative(x, width, height) {
+        if (Math.abs(x) > width) return 0;
+        return height;
+    }
+
+    function surrogateDerivative(x, width, height) {
+        var sel = document.getElementById('surrogate-type-select');
+        if (sel && sel.value === 'boxcar') return boxcarDerivative(x, width, height);
+        return triangularDerivative(x, width, height);
+    }
+
     function heaviside(x) {
         return x > 0 ? 1 : 0;
     }
@@ -46,7 +57,7 @@ document.addEventListener('DOMContentLoaded', function() {
             var uDeriv = alpha * uDerivatives[t - 1] + w - resetTerm;
             uHistory.push(u);
             s = heaviside(u - threshold);
-            var sDeriv = triangularDerivative(u - threshold, width, height) * uDeriv;
+            var sDeriv = surrogateDerivative(u - threshold, width, height) * uDeriv;
             sDerivatives.push(sDeriv);
             if (s) spikeTimes.push(t);
             uDerivatives.push(uDeriv);
@@ -87,7 +98,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // First plot: single neuron over time
         var result = simulate(x, threshold, alpha, width, height, includeReset, N_TIMESTEPS, inputCutoff);
-        var time = Array.from({ length: result.uHistory.length }, function(_, i) { return i; });
+        var time = Array.from({ length: result.uHistory.length }, function (_, i) { return i; });
 
         var traceU = {
             x: time,
@@ -110,7 +121,7 @@ document.addEventListener('DOMContentLoaded', function() {
         };
 
         var spikeX = result.spikeTimes;
-        var spikeY = result.spikeTimes.map(function(t) { return result.uHistory[t]; });
+        var spikeY = result.spikeTimes.map(function (t) { return result.uHistory[t]; });
         var traceSpikes = {
             x: spikeX,
             y: spikeY,
@@ -259,6 +270,9 @@ document.addEventListener('DOMContentLoaded', function() {
     if (cutoffInput) cutoffInput.addEventListener('input', updatePlot);
     if (heightInput) heightInput.addEventListener('input', updatePlot);
     resetToggle.addEventListener('change', updatePlot);
+
+    var surrogateSelect = document.getElementById('surrogate-type-select');
+    if (surrogateSelect) surrogateSelect.addEventListener('change', updatePlot);
 
     updatePlot();
 });

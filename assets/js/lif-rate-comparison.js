@@ -19,6 +19,17 @@ document.addEventListener('DOMContentLoaded', function () {
         return height * (1 - Math.abs(x) / width);
     }
 
+    function boxcarDerivative(x, width, height) {
+        if (Math.abs(x) > width) return 0;
+        return height;
+    }
+
+    function surrogateDerivative(x, width, height) {
+        var sel = document.getElementById('surrogate-type-select');
+        if (sel && sel.value === 'boxcar') return boxcarDerivative(x, width, height);
+        return triangularDerivative(x, width, height);
+    }
+
     // Simulate spiking LIF
     function simulate(inputVal, height) {
         var u = 0;
@@ -32,7 +43,7 @@ document.addEventListener('DOMContentLoaded', function () {
             var resetTerm = sDerivatives[t - 1] * THETA;
             var uDeriv = ALPHA * uDerivatives[t - 1] + 1 - resetTerm;
             s = heaviside(u - THETA);
-            var sDeriv = triangularDerivative(u - THETA, WIDTH, height) * uDeriv;
+            var sDeriv = surrogateDerivative(u - THETA, WIDTH, height) * uDeriv;
             sDerivatives.push(sDeriv);
             uDerivatives.push(uDeriv);
             spikes += s;
@@ -145,4 +156,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     draw();
+
+    var surrogateSelect = document.getElementById('surrogate-type-select');
+    if (surrogateSelect) surrogateSelect.addEventListener('change', draw);
 });

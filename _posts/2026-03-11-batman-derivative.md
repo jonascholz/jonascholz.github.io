@@ -24,12 +24,36 @@ We have a single LIF neuron receiving a constant input $\cX{x}$ through a weight
 \label{eq:lif}
 \end{equation}
 
-The spike output is $\cS{S[t]} = \Theta(\cU{U[t]} - \ctheta{\theta})$, and we use a triangular surrogate gradient for the derivative of the Heaviside:
+The spike output is $\cS{S[t]} = \Theta(\cU{U[t]} - \ctheta{\theta})$, and we use a <select id="surrogate-type-select" style="border: none; border-bottom: 1px dashed #ccc; font: inherit; color: inherit; background: transparent; padding: 0 0.2em; cursor: pointer;"><option value="triangular">triangular</option><option value="boxcar">boxcar</option></select> surrogate gradient for the derivative of the Heaviside:
 
+<div id="eq-triangular-surrogate">
 \begin{equation}
 \tilde{\Theta}'(x) = \text{height} \cdot \max\left(0,\; 1 - \frac{\lvert x \rvert}{\text{width}}\right)
 \label{eq:surrogate}
 \end{equation}
+</div>
+<div id="eq-boxcar-surrogate" style="display:none">
+\begin{equation}
+\tilde{\Theta}'(x) = \text{height} \cdot \mathbf{1}\!\left[\lvert x \rvert \leq \text{width}\right]
+\label{eq:surrogate-boxcar}
+\end{equation}
+</div>
+
+<script>
+(function() {
+    function onSurrogateChange() {
+        var sel = document.getElementById('surrogate-type-select');
+        if (!sel) return;
+        var isBoxcar = sel.value === 'boxcar';
+        document.getElementById('eq-triangular-surrogate').style.display = isBoxcar ? 'none' : '';
+        document.getElementById('eq-boxcar-surrogate').style.display = isBoxcar ? '' : 'none';
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+        var sel = document.getElementById('surrogate-type-select');
+        if (sel) sel.addEventListener('change', onSurrogateChange);
+    });
+})();
+</script>
 
 <figure id="fig:triangular_surrogate">
 <div id="triangular-surrogate-plot" style="width: 100%; margin: 2em auto;"></div>
@@ -94,7 +118,7 @@ Use the sliders to adjust the input value $\cX{x}$, firing threshold $\ctheta{\t
     </div>
     <div style="display: flex; flex-direction: column; align-items: center;">
         <label for="lif-alpha-slider" style="color: blue; font-weight: bold;">α</label>
-        <input type="range" min="0.5" max="0.99" value="0.8" step="0.01" id="lif-alpha-slider" style="box-shadow: none;">
+        <input type="range" min="0.2" max="0.99" value="0.8" step="0.01" id="lif-alpha-slider" style="box-shadow: none;">
         <span id="lif-alpha-value" style="color: blue;">0.80</span>
     </div>
     <div style="display: flex; flex-direction: column; align-items: center;">
@@ -144,4 +168,4 @@ This is all just speculation though. And besides, rate coded LIFs might not be t
 
 ## Acknowledgements
 
-Thanks to [@Alex](https://alex-vasilache.github.io/) for coining the term of the Batman derivative and for his input on how to shape gradients.
+Thanks to [@Alex](https://alex-vasilache.github.io/) for coining the Batman derivative and for his input on how to shape gradients.

@@ -103,14 +103,26 @@ document.addEventListener('DOMContentLoaded', function () {
         svg.appendChild(createLine(scaleX(xMin, rightPlotX), scaleY(0), scaleX(xMax, rightPlotX), scaleY(0), '#999', 1));
         svg.appendChild(createLine(scaleX(0, rightPlotX), scaleY(-0.1), scaleX(0, rightPlotX), scaleY(yMaxScale), '#999', 1));
 
+        var surrogateType = (function () {
+            var sel = document.getElementById('surrogate-type-select');
+            return sel ? sel.value : 'triangular';
+        })();
+
         function triangular(x) {
             if (Math.abs(x) > w) return 0;
             return peakHeight * (1 - Math.abs(x) / w);
         }
 
-        pathD = 'M ' + scaleX(xRange[0], rightPlotX) + ',' + scaleY(triangular(xRange[0]));
+        function boxcar(x) {
+            if (Math.abs(x) > w) return 0;
+            return peakHeight;
+        }
+
+        var surrogateFn = surrogateType === 'boxcar' ? boxcar : triangular;
+
+        pathD = 'M ' + scaleX(xRange[0], rightPlotX) + ',' + scaleY(surrogateFn(xRange[0]));
         for (var j = 1; j < xRange.length; j++) {
-            pathD += ' L ' + scaleX(xRange[j], rightPlotX) + ',' + scaleY(triangular(xRange[j]));
+            pathD += ' L ' + scaleX(xRange[j], rightPlotX) + ',' + scaleY(surrogateFn(xRange[j]));
         }
         svg.appendChild(createPath(pathD, surrogateColor, 2.5));
 
@@ -139,5 +151,11 @@ document.addEventListener('DOMContentLoaded', function () {
     var heightInput = document.getElementById('lif-height-input');
     if (heightInput) {
         heightInput.addEventListener('input', draw);
+    }
+
+    // Listen for surrogate type changes
+    var surrogateSelect = document.getElementById('surrogate-type-select');
+    if (surrogateSelect) {
+        surrogateSelect.addEventListener('change', draw);
     }
 });
