@@ -29,3 +29,6 @@ Citations use a custom include system with two components:
 2. Cite inline with: `{% include cite.html key="he2015" %}`
 
 3. Render the reference list at the bottom of the post with: `{% include references.html %}`
+
+## General Notes
+Don't use em-dashes. Use commas or restructure your sentences.

@@ -22,7 +22,7 @@
 <meta name="msapplication-TileImage" content="{{ base_path }}/images/mstile-144x144.png?v=M44lzPylqQ">
 <meta name="msapplication-config" content="{{ base_path }}/images/browserconfig.xml?v=M44lzPylqQ">
 <meta name="theme-color" content="#ffffff">
-<link rel="stylesheet" href="{{ base_path }}/assets/css/academicons.css"/>
+<link rel="stylesheet" href="{{ base_path }}/assets/css/academicons.css" />
 
 
 <!-- Support for MathJax with equation numbering -->
@@ -51,6 +51,8 @@ MathJax.Hub.Config({
       cWrec: ["{\\color{teal}#1}", 1],
       calpha: ["{\\color{blue}#1}", 1],
       ctheta: ["{\\color{brown}#1}", 1],
+      cD: ["{\\color{violet}#1}", 1],
+      cp: ["{\\color{darkcyan}#1}", 1],
       cE: ["{\\color{olive}#1}", 1],
       cyhat: ["{\\color{green}#1}", 1],
       cytarget: ["{\\color{magenta}#1}", 1]
@@ -66,91 +68,91 @@ MathJax.Hub.Config({
 
 <!-- Custom CSS for MathJax equation numbering -->
 <style>
-/* Style equation numbers */
-.MathJax .MathJax_ref {
-  color: #0066cc;
-  text-decoration: none;
-}
+  /* Style equation numbers */
+  .MathJax .MathJax_ref {
+    color: #0066cc;
+    text-decoration: none;
+  }
 
-.MathJax .MathJax_ref:hover {
-  text-decoration: underline;
-}
+  .MathJax .MathJax_ref:hover {
+    text-decoration: underline;
+  }
 
-/* Equation number styling */
-.MathJax_Display .MJXc-TeX-unknown-R {
-  color: #666;
-  font-size: 0.9em;
-}
+  /* Equation number styling */
+  .MathJax_Display .MJXc-TeX-unknown-R {
+    color: #666;
+    font-size: 0.9em;
+  }
 
-/* Ensure proper spacing for display equations */
-.MathJax_Display {
-  margin: 1em 0;
-  text-align: center;
-}
+  /* Ensure proper spacing for display equations */
+  .MathJax_Display {
+    margin: 1em 0;
+    text-align: center;
+  }
 
-/* Figure styling */
-figure {
-  margin: 2em 0;
-  text-align: center;
-}
+  /* Figure styling */
+  figure {
+    margin: 2em 0;
+    text-align: center;
+  }
 
-figcaption {
-  margin-top: 0.5em;
-  font-style: italic;
-  color: #666;
-  text-align: center;
-  font-size: 0.9em;
-  line-height: 1.4;
-}
+  figcaption {
+    margin-top: 0.5em;
+    font-style: italic;
+    color: #666;
+    text-align: center;
+    font-size: 0.9em;
+    line-height: 1.4;
+  }
 
-figcaption strong {
-  font-weight: bold;
-  color: #333;
-}
+  figcaption strong {
+    font-weight: bold;
+    color: #333;
+  }
 </style>
 
 <!-- Code copy button script -->
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  // Find all code block containers
-  const codeContainers = document.querySelectorAll('div.highlighter-rouge, figure.highlight');
+  document.addEventListener('DOMContentLoaded', function () {
+    // Find all code block containers
+    const codeContainers = document.querySelectorAll('div.highlighter-rouge, figure.highlight');
 
-  codeContainers.forEach(function(container) {
-    // Make the ::before pseudo-element clickable by adding a real button
-    container.style.cursor = 'pointer';
+    codeContainers.forEach(function (container) {
+      // Make the ::before pseudo-element clickable by adding a real button
+      container.style.cursor = 'pointer';
 
-    // Add click handler to the container
-    container.addEventListener('click', function(e) {
-      // Only trigger if clicking near the top-right (where the icon is)
-      const rect = container.getBoundingClientRect();
-      const clickX = e.clientX - rect.left;
-      const clickY = e.clientY - rect.top;
+      // Add click handler to the container
+      container.addEventListener('click', function (e) {
+        // Only trigger if clicking near the top-right (where the icon is)
+        const rect = container.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        const clickY = e.clientY - rect.top;
 
-      // Check if click is in top-right area (approximate icon location)
-      if (clickX > rect.width - 50 && clickY < 50) {
-        // Find the code element
-        const codeElement = container.querySelector('pre, code');
-        if (!codeElement) return;
+        // Check if click is in top-right area (approximate icon location)
+        if (clickX > rect.width - 50 && clickY < 50) {
+          // Find the code element
+          const codeElement = container.querySelector('pre, code');
+          if (!codeElement) return;
 
-        const code = codeElement.textContent;
+          const code = codeElement.textContent;
 
-        // Copy to clipboard
-        navigator.clipboard.writeText(code).then(function() {
-          // Visual feedback - temporarily change the icon
-          const originalContent = window.getComputedStyle(container, '::before').content;
-          container.classList.add('copied');
+          // Copy to clipboard
+          navigator.clipboard.writeText(code).then(function () {
+            // Visual feedback - temporarily change the icon
+            const originalContent = window.getComputedStyle(container, '::before').content;
+            container.classList.add('copied');
 
-          // Reset after 1 second
-          setTimeout(function() {
-            container.classList.remove('copied');
-          }, 1000);
-        }).catch(function(err) {
-          console.error('Failed to copy code: ', err);
-        });
-      }
+            // Reset after 1 second
+            setTimeout(function () {
+              container.classList.remove('copied');
+            }, 1000);
+          }).catch(function (err) {
+            console.error('Failed to copy code: ', err);
+          });
+        }
+      });
     });
   });
-});
 </script>
 
 <!-- end custom head snippets -->
