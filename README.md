@@ -13,8 +13,25 @@ Here are my changes:
 
 Since this thing doesn't seem to run on Windows I run it in WSL. Good luck setting that up if you never heard of it before.
 
-## Local execution
+## Local execution (Linux)
 
-Make sure to follow the instructions from https://github.com/academicpages/academicpages.github.io to set up all the dependencies.
+Bare necessities on Debian/Ubuntu:
 
-Once everything is installed, run `bundle exec jekyll serve -H localhost` to generate the HTML and serve it from `localhost:4000` the local server will automatically rebuild and refresh the pages on change. 
+```bash
+sudo apt update
+sudo apt install -y ruby-full build-essential
+sudo gem install bundler
+```
+
+Then install dependencies locally in the project and run the dev server:
+
+```bash
+cd /home/affe/jonascholz.github.io
+bundle config set --local path 'vendor/bundle'
+bundle install
+bundle exec jekyll serve -H localhost
+```
+
+Open http://localhost:4000 in your browser. Jekyll will rebuild automatically when files change.
+
+You can still check the upstream setup notes at https://github.com/academicpages/academicpages.github.io.
