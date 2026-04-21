@@ -42,67 +42,9 @@ $$
 \text{Var}[\cU{U_l^t}] = \underbrace{\text{Var}[\calpha{\alpha} \cU{U_l^{t-1}} - \cS{X_l^{t-1}} \ctheta{\theta}]}_{\text{reset-decay term}} + \underbrace{\text{Var}[\cWin{W_l} \cX{X_{l-1}^t}]}_{\text{input term}}
 $$
 
-## Expanding the reset-decay term
-
-We expand the left term using the identity for any two random variables $A$ and $B$:
-
-$$
-\text{Var}[A - B] = \text{Var}[A] - 2\,\text{Cov}[A, B] + \text{Var}[B]
-$$
-
-And we find that:
-
-$$
-\text{Var}[\calpha{\alpha} \cU{U_l^{t-1}} - \cS{X_l^{t-1}} \ctheta{\theta}] = \text{Var}[\calpha{\alpha} \cU{U_l^{t-1}}] - 2\,\text{Cov}[\calpha{\alpha} \cU{U_l^{t-1}},\, \cS{X_l^{t-1}} \ctheta{\theta}] + \text{Var}[\cS{X_l^{t-1}} \ctheta{\theta}]
-$$
-
-Since $\calpha{\alpha}$ and $\ctheta{\theta}$ are deterministic constants (hyperparameters, not random variables), we can use $\text{Var}[cX] = c^2 \text{Var}[X]$ and $\text{Cov}[cX, dY] = cd\,\text{Cov}[X, Y]$:
-
-$$
-= \calpha{\alpha}^2 \text{Var}[\cU{U_l^{t-1}}] - 2\calpha{\alpha}\ctheta{\theta}\,\text{Cov}[\cU{U_l^{t-1}}, \cS{X_l^{t-1}}] + \ctheta{\theta}^2 \text{Var}[\cS{X_l^{t-1}}]
-$$
-
-### Variance of a binary spike
-
-Using the definition of variance, $\text{Var}[Y] = \mathbb{E}[Y^2] - \mathbb{E}[Y]^2$, we can write:
-
-$$
-\text{Var}[\cS{X_l^{t-1}}] = \mathbb{E}[(\cS{X_l^{t-1}})^2] - \mathbb{E}[\cS{X_l^{t-1}}]^2
-$$
-
-Now, $\cS{X_l^{t-1}} \in \{0, 1\}$ is a binary spike, so $(\cS{X_l^{t-1}})^2 = \cS{X_l^{t-1}}$. Letting $\cp{p} = \mathbb{E}[\cS{X_l^{t-1}}]$ denote the spike probability. We assume all layers fire at the same average rate $\cp{p}$, so this same value applies to the input spikes $\cX{X_{l-1}^t}$ as well:
-
-$$
-\text{Var}[\cS{X_l^{t-1}}] = \cp{p} - \cp{p}^2 = \cp{p}(1-\cp{p})
-$$
-
-Substituting back:
-
-$$
-\text{Var}[\calpha{\alpha} \cU{U_l^{t-1}} - \cS{X_l^{t-1}} \ctheta{\theta}] = \calpha{\alpha}^2 \text{Var}[\cU{U_l^{t-1}}] - 2\calpha{\alpha}\ctheta{\theta}\,\text{Cov}[\cU{U_l^{t-1}}, \cS{X_l^{t-1}}] + \ctheta{\theta}^2 \cp{p}(1-\cp{p})
-$$
-
-So the full equation now reads:
-
-$$
-\text{Var}[\cU{U_l^t}] = \calpha{\alpha}^2 \text{Var}[\cU{U_l^{t-1}}] - 2\calpha{\alpha}\ctheta{\theta}\,\text{Cov}[\cU{U_l^{t-1}}, \cS{X_l^{t-1}}] + \ctheta{\theta}^2 \cp{p}(1-\cp{p}) + \text{Var}[\cWin{W_l} \cX{X_{l-1}^t}]
-$$
-
-## Applying the fixed-point condition
-
-We seek a stationary variance, so we impose $\text{Var}[\cU{U_l^t}] = \text{Var}[\cU{U_l^{t-1}}] = 1$. Substituting:
-
-$$
-1 = \calpha{\alpha}^2 \cdot 1 - 2\calpha{\alpha}\ctheta{\theta}\,\text{Cov}[\cU{U_l^{t-1}}, \cS{X_l^{t-1}}] + \ctheta{\theta}^2 \cp{p}(1-\cp{p}) + \text{Var}[\cWin{W_l} \cX{X_{l-1}^t}]
-$$
-
-Isolating the input term:
-
-$$
-\text{Var}[\cWin{W_l} \cX{X_{l-1}^t}] = 1 - \calpha{\alpha}^2 + 2\calpha{\alpha}\ctheta{\theta}\,\text{Cov}[\cU{U_l^{t-1}}, \cS{X_l^{t-1}}] - \ctheta{\theta}^2 \cp{p}(1-\cp{p})
-$$
-
 ## Expanding the input term
+<details>
+<summary>Skip it if you want</summary>
 
 Since all neurons in a layer share the same weight statistics, we can study a single neuron. Its pre-activation is one row of $\cWin{W_l}$ dotted with the full input vector $\cX{X_{l-1}^t}$:
 
@@ -182,6 +124,74 @@ Since weights are i.i.d. and input spikes are identically distributed with mean 
 
 $$
 \text{Var}[\cWin{W_l} \cX{X_{l-1}^t}] = n_l\,\text{Var}[\cWin{W_l}] \cdot \cp{p}
+$$
+
+</details>
+
+$$
+\text{Var}[\cU{U_l^t}] = \underbrace{\text{Var}[\calpha{\alpha} \cU{U_l^{t-1}} - \cS{X_l^{t-1}} \ctheta{\theta}]}_{\text{reset-decay term}} + n_l\,\text{Var}[\cWin{W_l}] \cdot \cp{p}
+\label{eq:var_u_input_expanded}
+$$
+
+
+## Expanding the reset-decay term
+
+We expand the left term using the identity for any two random variables $A$ and $B$:
+
+$$
+\text{Var}[A - B] = \text{Var}[A] - 2\,\text{Cov}[A, B] + \text{Var}[B]
+$$
+
+And we find that:
+
+$$
+\text{Var}[\calpha{\alpha} \cU{U_l^{t-1}} - \cS{X_l^{t-1}} \ctheta{\theta}] = \text{Var}[\calpha{\alpha} \cU{U_l^{t-1}}] - 2\,\text{Cov}[\calpha{\alpha} \cU{U_l^{t-1}},\, \cS{X_l^{t-1}} \ctheta{\theta}] + \text{Var}[\cS{X_l^{t-1}} \ctheta{\theta}]
+$$
+
+Since $\calpha{\alpha}$ and $\ctheta{\theta}$ are deterministic constants (hyperparameters, not random variables), we can use $\text{Var}[cX] = c^2 \text{Var}[X]$ and $\text{Cov}[cX, dY] = cd\,\text{Cov}[X, Y]$:
+
+$$
+= \calpha{\alpha}^2 \text{Var}[\cU{U_l^{t-1}}] - 2\calpha{\alpha}\ctheta{\theta}\,\text{Cov}[\cU{U_l^{t-1}}, \cS{X_l^{t-1}}] + \ctheta{\theta}^2 \text{Var}[\cS{X_l^{t-1}}]
+$$
+
+### Variance of a binary spike
+
+Using the definition of variance, $\text{Var}[Y] = \mathbb{E}[Y^2] - \mathbb{E}[Y]^2$, we can write:
+
+$$
+\text{Var}[\cS{X_l^{t-1}}] = \mathbb{E}[(\cS{X_l^{t-1}})^2] - \mathbb{E}[\cS{X_l^{t-1}}]^2
+$$
+
+Now, $\cS{X_l^{t-1}} \in \{0, 1\}$ is a binary spike, so $(\cS{X_l^{t-1}})^2 = \cS{X_l^{t-1}}$. Letting $\cp{p} = \mathbb{E}[\cS{X_l^{t-1}}]$ denote the spike probability. We assume all layers fire at the same average rate $\cp{p}$, so this same value applies to the input spikes $\cX{X_{l-1}^t}$ as well:
+
+$$
+\text{Var}[\cS{X_l^{t-1}}] = \cp{p} - \cp{p}^2 = \cp{p}(1-\cp{p})
+$$
+
+Substituting back:
+
+$$
+\text{Var}[\calpha{\alpha} \cU{U_l^{t-1}} - \cS{X_l^{t-1}} \ctheta{\theta}] = \calpha{\alpha}^2 \text{Var}[\cU{U_l^{t-1}}] - 2\calpha{\alpha}\ctheta{\theta}\,\text{Cov}[\cU{U_l^{t-1}}, \cS{X_l^{t-1}}] + \ctheta{\theta}^2 \cp{p}(1-\cp{p})
+$$
+
+So the full equation now reads:
+
+$$
+\text{Var}[\cU{U_l^t}] = \calpha{\alpha}^2 \text{Var}[\cU{U_l^{t-1}}] - 2\calpha{\alpha}\ctheta{\theta}\,\text{Cov}[\cU{U_l^{t-1}}, \cS{X_l^{t-1}}] + \ctheta{\theta}^2 \cp{p}(1-\cp{p}) + \text{Var}[\cWin{W_l} \cX{X_{l-1}^t}]
+$$
+
+## Applying the fixed-point condition
+
+We seek a stationary variance, so we impose $\text{Var}[\cU{U_l^t}] = \text{Var}[\cU{U_l^{t-1}}] = 1$. Substituting:
+
+$$
+1 = \calpha{\alpha}^2 \cdot 1 - 2\calpha{\alpha}\ctheta{\theta}\,\text{Cov}[\cU{U_l^{t-1}}, \cS{X_l^{t-1}}] + \ctheta{\theta}^2 \cp{p}(1-\cp{p}) + \text{Var}[\cWin{W_l} \cX{X_{l-1}^t}]
+$$
+
+Isolating the input term:
+
+$$
+\text{Var}[\cWin{W_l} \cX{X_{l-1}^t}] = 1 - \calpha{\alpha}^2 + 2\calpha{\alpha}\ctheta{\theta}\,\text{Cov}[\cU{U_l^{t-1}}, \cS{X_l^{t-1}}] - \ctheta{\theta}^2 \cp{p}(1-\cp{p})
 $$
 
 ## Intermediate result (mostly correct I think)

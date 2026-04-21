@@ -7,6 +7,7 @@ If you are working in the _posts folder, this usually means the user is writing 
 - **Inline math**: Use single `$`, e.g. `$x^2$`. Never use `$$` for inline math.
 - **Display math**: Use `\begin{equation}...\end{equation}` for standalone equations with labels.
 - **Fallback**: Some things like `align`, multiple underbraces, etc. are bugged in Jekyll when wrapped with `\begin{equation}`. In those cases use `$$` instead for display math.
+- **Negative space**: `\!` does not render and should never be used.
 
 ## Citations
 
@@ -31,4 +32,4 @@ Citations use a custom include system with two components:
 3. Render the reference list at the bottom of the post with: `{% include references.html %}`
 
 ## General Notes
-Don't use em-dashes. Use commas or restructure your sentences.
+Don't use em-dashes. Use commas or restructure your sentences. When writing in the markdown files, the math notation has to conform to the stated rules and to the style of the document. However, when replying to the user in a chat window, there is no rendering support for math.

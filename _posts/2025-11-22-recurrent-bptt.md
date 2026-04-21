@@ -43,7 +43,7 @@ In this case we can describe the membrane potential $$\cU{U[t]}$$ as:
 where $$\calpha{\alpha}$$ is a decay term, $$\cX{X[t]}$$ is the input at time $$t$$ and $$\ctheta{\theta}$$ is the firing threshold. $$\cS{S[t-1]}$$ is the outgoing spike at time $$t-1$$. Note that if there was a spike at the previous timestep $$t-1$$ we subtract the firing threshold from the membrane potential in order to reset it. This is a simple version of the LIF refractory mechanism. The outgoing spike is defined as 
 
 \begin{equation}
-\cS{S[t]} = \Theta(\cU{U[t]} - \ctheta{\theta})
+\cS{S[t]} = \Theta(\cU{U[t]} - \ctheta{\theta}) 
 \label{eq:spike_function}
 \end{equation}
 
