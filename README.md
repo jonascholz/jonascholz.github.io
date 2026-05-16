@@ -29,6 +29,11 @@ Then install dependencies locally in the project and run the dev server:
 cd /home/affe/jonascholz.github.io
 bundle config set --local path 'vendor/bundle'
 bundle install
+```
+
+And finally run the thing:
+
+```bash
 bundle exec jekyll serve -H localhost
 ```
 
