@@ -1,6 +1,6 @@
 ---
 title: "KnowlEdge"
-excerpt: "Unsupervised analyses on an EU project. [Learn more](/projects/02_knowledge/) <br/><img src='/images/projects/knowledge.png'>"
+excerpt: "Unsupervised analyses on an EU project. [Learn more](/projects/03_knowledge) <br/><img src='/images/projects/knowledge.png'>"
 collection: projects
 tags: 
     - EU project

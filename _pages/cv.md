@@ -13,7 +13,7 @@ redirect_from:
   <img src="{{ base_path }}/images/profile.jpg" alt="Jona Scholz" style="border-radius: 8px; width: 200px; height: 200px; object-fit: cover; flex-shrink: 0;">
   <div>
     <h1 style="margin-top: 0;">Hi, I'm Jona</h1>
-    <p>Recently my work has been in the field of Neuromorphic Computing, but I work on anything that may lead to AGI. Prior to this I was a Software Developer, working in typical SCRUM teams or whatever the project required. I manage my code in Git and try to find scalable solutions whenever possible.</p>
+    <p>I'm working towards AGI. I wasted some time on SNNs and then went into world models. Prior to this I was a Software Developer.</p>
   </div>
 </div>
 
@@ -26,7 +26,7 @@ Education
 Work experience
 ======
 * PhD Candidate - KIT, 2025 - today 
-  * Research on learning methods for spiking neural networks
+  * Research on world models for robotics
 
 * Research Assistant - FZI (Research Center), 2024 - 2025 (~1 year)
   * Research on spiking neural networks, implementation of learning

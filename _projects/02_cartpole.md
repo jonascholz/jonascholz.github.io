@@ -1,6 +1,6 @@
 ---
 title: "SNN Reinforcement Learning with R-STDP"
-excerpt: "Training SNNs with biologically plausible learning algorithms on Reinforcement Learning problems. [Learn more](/projects/01_cartpole/)<br/><img src='/images/projects/cartpole.gif'>"
+excerpt: "Training SNNs with biologically plausible learning algorithms on Reinforcement Learning problems. [Learn more](/projects/02_cartpole)<br/><img src='/images/projects/cartpole.gif'>"
 collection: projects
 tags: 
     - SNN
