@@ -1,0 +1,340 @@
+/* ---------- Theme tokens ----------
+ * Every color is light-dark(<light>, <dark>). The theme toggle sets
+ * data-theme, which pins color-scheme; otherwise the OS preference wins.
+ */
+:root {
+  color-scheme: light dark;
+  --bg: light-dark(#fbfaf7, #0f1115);
+  --surface: light-dark(#ffffff, #161920);
+  --surface-2: light-dark(#f3f1ec, #1c2029);
+  --fg: light-dark(#1b1b1f, #e7e7ea);
+  --muted: light-dark(#5d6068, #a3a7b1);
+  --faint: light-dark(#9a9da5, #6c707a);
+  --border: light-dark(#e3e0d8, #2a2f3a);
+  --accent: light-dark(#1f5bd6, #8ab0ff);
+  --accent-soft: light-dark(#e6edfb, #1b2640);
+  --code-bg: light-dark(#f4f2ed, #161a22);
+  --shadow-color: light-dark(rgb(0 0 0 / 0.05), rgb(0 0 0 / 0.35));
+  --shadow: 0 1px 2px var(--shadow-color), 0 4px 16px var(--shadow-color);
+
+  /* Diagrams (see src/diagrams/lib/svg.ts) */
+  --d-ink: light-dark(#333333, #d9dbe1);
+  --d-axis: light-dark(#666666, #9ba0aa);
+  --d-muted: light-dark(#999999, #747a86);
+  --d-grid: light-dark(#e6e6e6, #2a2f39);
+  --d-paper: light-dark(#ffffff, #161920);
+  --d-node: light-dark(#f0f8ff, #1b2434);
+
+  --font-serif: 'Source Serif 4 Variable', 'Iowan Old Style', Georgia, serif;
+  --font-sans: 'Inter Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  --measure: 44rem;
+  --wide: 68rem;
+  --gutter: clamp(1rem, 4vw, 2rem);
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+}
+
+/* ---------- Base ---------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-padding-top: 5rem;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+a {
+  color: var(--accent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+}
+
+a:hover {
+  text-decoration-thickness: 2px;
+}
+
+img,
+svg,
+video {
+  max-width: 100%;
+  height: auto;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.container {
+  width: 100%;
+  max-width: calc(var(--wide) + 2 * var(--gutter));
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.narrow {
+  max-width: calc(var(--measure) + 2 * var(--gutter));
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.eyebrow {
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.tag {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--muted);
+}
+
+/* ---------- Prose (posts, projects, pages) ---------- */
+.prose {
+  font-family: var(--font-serif);
+  font-size: 1.125rem;
+  line-height: 1.72;
+  overflow-wrap: break-word;
+}
+
+.prose > * + * {
+  margin-top: 1.1em;
+}
+
+/* Zero specificity, so the flow spacing above always wins. */
+:where(.prose) :where(p, ul, ol) {
+  margin-block: 0;
+}
+
+.prose li + li {
+  margin-top: 0.35em;
+}
+
+.prose h2,
+.prose h3,
+.prose h4 {
+  font-family: var(--font-sans);
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  margin-top: 2.2em;
+  margin-bottom: 0;
+}
+
+.prose h2 {
+  font-size: 1.5rem;
+}
+
+.prose h3 {
+  font-size: 1.2rem;
+}
+
+.prose h2 + *,
+.prose h3 + * {
+  margin-top: 0.7em;
+}
+
+.prose strong {
+  font-weight: 650;
+}
+
+.prose hr {
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin-block: 2.5em;
+}
+
+.prose blockquote {
+  margin-inline: 0;
+  padding-left: 1em;
+  border-left: 3px solid var(--border);
+  color: var(--muted);
+}
+
+.prose img {
+  display: block;
+  margin-inline: auto;
+  border-radius: 6px;
+}
+
+.prose table {
+  border-collapse: collapse;
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+}
+
+.prose :is(th, td) {
+  border-bottom: 1px solid var(--border);
+  padding: 0.4em 0.8em;
+  text-align: left;
+}
+
+/* Inline code */
+.prose :not(pre) > code {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.05em 0.3em;
+}
+
+/* Code blocks (Shiki, dual theme) */
+.prose pre {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  line-height: 1.6;
+  background: var(--code-bg) !important;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem 1.1rem;
+  overflow-x: auto;
+  position: relative;
+}
+
+.prose pre code {
+  font-family: inherit;
+}
+
+.astro-code,
+.astro-code span {
+  color: light-dark(var(--shiki-light), var(--shiki-dark));
+}
+
+.copy-button {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  font: 500 0.72rem var(--font-sans);
+  color: var(--muted);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 0.2rem 0.5rem;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.prose pre:hover .copy-button,
+.copy-button:focus-visible {
+  opacity: 1;
+}
+
+/* Math */
+.math-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  margin-block: 1.2em;
+  padding-block: 0.2em;
+}
+
+.math-display mjx-container[display='true'] {
+  margin: 0 !important;
+}
+
+mjx-container a {
+  color: inherit;
+}
+
+/* Figures */
+.prose figure {
+  margin: 2em 0;
+}
+
+.prose figcaption {
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--muted);
+  text-align: center;
+  margin: 0.75em auto 0;
+  max-width: 40rem;
+}
+
+.prose figcaption strong {
+  color: var(--fg);
+}
+
+/* Collapsible asides */
+.prose details {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  padding: 0.6rem 1rem;
+}
+
+.prose details > summary {
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--accent);
+}
+
+.prose details[open] > summary {
+  margin-bottom: 0.8em;
+}
+
+.prose details > :not(summary) + * {
+  margin-top: 1em;
+}
+
+/* Citations */
+.citation {
+  font-family: var(--font-sans);
+  font-size: 0.85em;
+  white-space: nowrap;
+}
+
+.citation a {
+  text-decoration: none;
+}
+
+.prose figure.small img {
+  max-width: min(100%, 26rem);
+}
+
+@media (max-width: 34rem) {
+  .prose {
+    font-size: 1.0625rem;
+    line-height: 1.65;
+  }
+}

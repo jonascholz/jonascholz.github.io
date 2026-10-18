@@ -1,0 +1,21 @@
+---
+import { render } from 'astro:content';
+import Article from '../../layouts/Article.astro';
+import { getPublications, routeParam } from '../../lib/content';
+
+export async function getStaticPaths() {
+  return (await getPublications()).map((publication) => ({
+    params: { slug: routeParam(publication.data.permalink, 'publication') },
+    props: { publication },
+  }));
+}
+
+const { publication } = Astro.props;
+const { Content } = await render(publication);
+const { title, description, date, venue, paperurl } = publication.data;
+---
+
+<Article title={title} description={description} date={date} eyebrow={`Publication · ${venue}`}>
+  <p><a href={paperurl}>Read the paper</a></p>
+  <Content />
+</Article>

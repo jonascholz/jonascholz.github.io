@@ -1,0 +1,54 @@
+---
+import Base from '../../layouts/Base.astro';
+import PostList from '../../components/PostList.astro';
+import { getPosts } from '../../lib/content';
+
+const posts = await getPosts();
+const years = [...new Set(posts.map((p) => p.data.date.getUTCFullYear()))];
+---
+
+<Base title="Writing" description="Notes and tutorials on robot learning, deep learning and spiking neural networks.">
+  <div class="container narrow page">
+    <header>
+      <p class="eyebrow">Writing</p>
+      <h1>Notes and tutorials</h1>
+      <p class="lede">
+        Derivations worked out step by step, mostly on training spiking neural networks. Subscribe via <a href="/feed.xml">RSS</a>.
+      </p>
+    </header>
+    {
+      years.map((y) => (
+        <section>
+          <h2 class="year">{y}</h2>
+          <PostList posts={posts.filter((p) => p.data.date.getUTCFullYear() === y)} />
+        </section>
+      ))
+    }
+  </div>
+</Base>
+
+<style>
+  .page {
+    padding-top: clamp(2rem, 6vw, 4rem);
+  }
+
+  h1 {
+    font-size: clamp(1.9rem, 5vw, 2.5rem);
+    letter-spacing: -0.02em;
+    margin: 0.3rem 0 0.6rem;
+  }
+
+  .lede {
+    color: var(--muted);
+    margin: 0 0 2rem;
+  }
+
+  .year {
+    font-size: 0.9rem;
+    color: var(--faint);
+    font-weight: 600;
+    margin: 2.5rem 0 0;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid var(--border);
+  }
+</style>

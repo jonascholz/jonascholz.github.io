@@ -1,0 +1,157 @@
+---
+/**
+ * A control bound to a page param that diagrams and `<Show>` blocks react to.
+ *
+ *   inline in prose:  <Param name="height" type="number" value={1} min={0.1} max={5} step={0.1} />
+ *                     <Param name="surrogate" type="select" value="triangular" options={['triangular', 'boxcar']} />
+ *   control panels:   <Param name="x" type="range" label="x" color="X" value={0.16} min={0.01} max={0.8} step={0.01} />
+ *                     <Param name="reset" type="checkbox" label="Reset term" value={true} />
+ *
+ * The initial `value` should match the default in the diagram's `params`.
+ */
+import { varColor, type VariableName } from '../lib/palette';
+
+interface Props {
+  name: string;
+  type: 'number' | 'select' | 'range' | 'checkbox';
+  value: number | string | boolean;
+  label?: string;
+  /** Palette variable used to color the label, e.g. "X" or "theta". */
+  color?: VariableName;
+  min?: number;
+  max?: number;
+  step?: number;
+  options?: string[];
+  /** Digits shown next to a range slider. */
+  digits?: number;
+}
+
+const { name, type, value, label, color, min, max, step, options = [], digits = 2 } = Astro.props;
+const id = `param-${name}`;
+const style = color ? `color:${varColor(color)}` : undefined;
+---
+
+{
+  type === 'number' && (
+    <input class="param-inline" id={id} data-param={name} type="number" value={value as number} min={min} max={max} step={step} aria-label={label ?? name} />
+  )
+}
+{
+  type === 'select' && (
+    <select class="param-inline" id={id} data-param={name} aria-label={label ?? name}>
+      {options.map((o) => (
+        <option value={o} selected={o === value}>
+          {o}
+        </option>
+      ))}
+    </select>
+  )
+}
+{
+  type === 'range' && (
+    <span class="param-control">
+      <label for={id} style={style}>{label ?? name}</label>
+      <input id={id} data-param={name} type="range" value={value as number} min={min} max={max} step={step} />
+      <output for={id} style={style} data-digits={digits}>{(value as number).toFixed(digits)}</output>
+    </span>
+  )
+}
+{
+  type === 'checkbox' && (
+    <span class="param-control">
+      <label for={id} style={style}>{label ?? name}</label>
+      <input id={id} data-param={name} type="checkbox" checked={value as boolean} />
+    </span>
+  )
+}
+
+<script>
+  import { setParam } from '../diagrams/lib/params';
+
+  function read(el: HTMLInputElement | HTMLSelectElement) {
+    if (el instanceof HTMLInputElement && el.type === 'checkbox') return el.checked;
+    if (el instanceof HTMLInputElement && (el.type === 'range' || el.type === 'number')) {
+      const v = el.valueAsNumber;
+      if (!Number.isFinite(v)) return undefined;
+      const min = el.min === '' ? -Infinity : Number(el.min);
+      const max = el.max === '' ? Infinity : Number(el.max);
+      return Math.min(max, Math.max(min, v));
+    }
+    return el.value;
+  }
+
+  for (const el of document.querySelectorAll<HTMLInputElement | HTMLSelectElement>('[data-param]')) {
+    const name = el.dataset.param!;
+    const out = el.parentElement?.querySelector('output');
+    const update = () => {
+      const v = read(el);
+      if (v === undefined) return;
+      if (out && typeof v === 'number') out.textContent = v.toFixed(Number(out.dataset.digits ?? 2));
+      setParam(name, v);
+    };
+    el.addEventListener('input', update);
+    el.addEventListener('change', update);
+    update();
+  }
+</script>
+
+<style>
+  .param-inline {
+    font: inherit;
+    color: var(--accent);
+    background: transparent;
+    border: 0;
+    border-bottom: 1px dashed currentColor;
+    padding: 0 0.15em;
+    cursor: pointer;
+  }
+
+  input.param-inline {
+    width: 3.2em;
+    text-align: center;
+    appearance: textfield;
+    -moz-appearance: textfield;
+  }
+
+  input.param-inline::-webkit-inner-spin-button,
+  input.param-inline::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  select.param-inline option {
+    color: var(--fg);
+    background: var(--surface);
+  }
+
+  .param-control {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+    font-family: var(--font-sans);
+    font-size: 0.85rem;
+  }
+
+  .param-control label {
+    font-weight: 650;
+    font-style: italic;
+  }
+
+  .param-control output {
+    font-variant-numeric: tabular-nums;
+    font-size: 0.8rem;
+  }
+
+  .param-control input[type='range'] {
+    width: 8.5rem;
+    accent-color: var(--accent);
+  }
+
+  .param-control input[type='checkbox'] {
+    width: 1.1rem;
+    height: 1.1rem;
+    margin-top: 0.35rem;
+    accent-color: var(--accent);
+  }
+</style>

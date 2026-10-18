@@ -1,0 +1,25 @@
+---
+/** A highlighted aside, e.g. "this post follows paper X". */
+---
+
+<aside class="notice"><slot /></aside>
+
+<style>
+  .notice {
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    background: var(--accent-soft);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 8px 8px 0;
+    padding: 0.9rem 1.1rem;
+  }
+
+  .notice :global(p) {
+    margin: 0;
+  }
+
+  .notice :global(p + p) {
+    margin-top: 0.6em;
+  }
+</style>

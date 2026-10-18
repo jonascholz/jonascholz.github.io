@@ -1,0 +1,69 @@
+---
+/**
+ * Renders a diagram from `src/diagrams/<name>.ts` to static SVG at build time.
+ * Diagrams that declare `params` re-render in the browser when a `<Param>`
+ * control changes them.
+ */
+import type { Diagram } from '../diagrams/lib/define';
+import { toSvgString } from '../diagrams/lib/svg';
+
+interface Props {
+  name: string;
+  /** Static configuration passed to the diagram (e.g. labels). */
+  props?: Record<string, unknown>;
+  /** Needed only when the same diagram appears twice on a page. */
+  id?: string;
+}
+
+const modules = import.meta.glob<{ default: Diagram<any, any> }>('../diagrams/*.ts', { eager: true });
+const { name, props = {}, id = name } = Astro.props;
+const mod = modules[`../diagrams/${name}.ts`]?.default;
+if (!mod) throw new Error(`Unknown diagram "${name}" (expected src/diagrams/${name}.ts)`);
+
+const html = toSvgString(mod.render({ id, props, params: { ...mod.params } }));
+const interactive = Object.keys(mod.params ?? {}).length > 0;
+---
+
+<div
+  class="diagram"
+  data-diagram={interactive ? name : undefined}
+  data-id={id}
+  data-props={interactive ? JSON.stringify(props) : undefined}
+  set:html={html}
+/>
+
+<script>
+  import type { Diagram } from '../diagrams/lib/define';
+  import { toSvgString } from '../diagrams/lib/svg';
+  import { getParams, subscribe } from '../diagrams/lib/params';
+
+  const modules = import.meta.glob<{ default: Diagram<any, any> }>('../diagrams/*.ts');
+
+  for (const el of document.querySelectorAll<HTMLElement>('[data-diagram]')) {
+    const load = modules[`../diagrams/${el.dataset.diagram}.ts`];
+    load?.().then(({ default: mod }) => {
+      const props = JSON.parse(el.dataset.props ?? '{}');
+      const defaults = mod.params ?? {};
+      const draw = () => {
+        el.innerHTML = toSvgString(mod.render({ id: el.dataset.id!, props, params: getParams(defaults) }));
+      };
+      subscribe(Object.keys(defaults), draw);
+      draw();
+    });
+  }
+</script>
+
+<style>
+  .diagram {
+    margin-block: 1.5em;
+    font-family: var(--font-sans);
+  }
+
+  .diagram :global(svg) {
+    display: block;
+    margin-inline: auto;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+</style>

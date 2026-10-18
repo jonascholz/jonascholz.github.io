@@ -1,0 +1,38 @@
+---
+/**
+ * A silent looping animation (the replacement for animated GIFs).
+ * In MDX: `import clip from './clip.mp4'` then `<Video src={clip} label="..." />`.
+ * Pauses itself for visitors who prefer reduced motion.
+ */
+interface Props {
+  src: string;
+  /** Accessible description of what the animation shows. */
+  label: string;
+  width?: number;
+  height?: number;
+}
+
+const { src, label, width, height } = Astro.props;
+---
+
+<video class="video" src={src} aria-label={label} width={width} height={height} autoplay loop muted playsinline preload="metadata"></video>
+
+<script>
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    for (const v of document.querySelectorAll<HTMLVideoElement>('video.video')) {
+      v.autoplay = false;
+      v.pause();
+      v.controls = true;
+    }
+  }
+</script>
+
+<style>
+  .video {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin-inline: auto;
+    border-radius: 6px;
+  }
+</style>

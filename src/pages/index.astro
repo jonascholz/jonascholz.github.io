@@ -1,0 +1,154 @@
+---
+import Base from '../layouts/Base.astro';
+import PostList from '../components/PostList.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import RobotDemo from '../components/three/RobotDemo.astro';
+import { getPosts, getProjects } from '../lib/content';
+import { site } from '../lib/site';
+
+const posts = (await getPosts()).slice(0, 4);
+const projects = await getProjects();
+---
+
+<Base>
+  <section class="container hero">
+    <div class="intro">
+      <p class="eyebrow">Robot learning · World models</p>
+      <h1>Jona Scholz</h1>
+      <p class="lede">
+        PhD candidate at <a href={site.affiliation.url}>ITIV, Karlsruhe Institute of Technology</a>, working on world
+        models for robotics. Before that I spent a good while trying to make spiking neural networks learn.
+      </p>
+      <p class="lede muted">This site collects my notes, step-by-step derivations and interactive experiments.</p>
+      <p class="links">
+        <a class="button" href="/blog/">Read the blog</a>
+        <a class="button ghost" href="/cv/">About me</a>
+      </p>
+    </div>
+    <figure class="demo">
+      <RobotDemo height="clamp(20rem, 42vw, 30rem)" />
+      <figcaption>
+        A live MuJoCo simulation running in your browser. <a href="/lab/">How it works</a>
+      </figcaption>
+    </figure>
+  </section>
+
+  <section class="container section">
+    <div class="section-head">
+      <h2>Recent writing</h2>
+      <a href="/blog/">All posts →</a>
+    </div>
+    <PostList posts={posts} />
+  </section>
+
+  <section class="container section">
+    <div class="section-head">
+      <h2>Projects</h2>
+      <a href="/projects/">All projects →</a>
+    </div>
+    <div class="grid">
+      {projects.map((p) => <ProjectCard project={p} />)}
+    </div>
+  </section>
+</Base>
+
+<style>
+  .hero {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: clamp(1.5rem, 4vw, 3.5rem);
+    align-items: center;
+    padding-block: clamp(2rem, 6vw, 4.5rem);
+  }
+
+  @media (max-width: 52rem) {
+    .hero {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  h1 {
+    font-size: clamp(2.4rem, 6vw, 3.6rem);
+    line-height: 1.05;
+    letter-spacing: -0.035em;
+    margin: 0.4rem 0 1.1rem;
+  }
+
+  .lede {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin: 0 0 0.8rem;
+    max-width: 34rem;
+  }
+
+  .muted {
+    color: var(--muted);
+  }
+
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1.6rem;
+  }
+
+  .button {
+    display: inline-block;
+    padding: 0.6rem 1.1rem;
+    border-radius: 8px;
+    background: var(--fg);
+    color: var(--bg);
+    font-weight: 600;
+    font-size: 0.92rem;
+    text-decoration: none;
+  }
+
+  .button.ghost {
+    background: transparent;
+    color: var(--fg);
+    border: 1px solid var(--border);
+  }
+
+  .button:hover {
+    opacity: 0.88;
+  }
+
+  .demo {
+    margin: 0;
+  }
+
+  .demo figcaption {
+    margin-top: 0.6rem;
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+
+  .section {
+    padding-top: 3.5rem;
+  }
+
+  .section-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.5rem;
+  }
+
+  .section-head h2 {
+    font-size: 1.35rem;
+    margin: 0;
+  }
+
+  .section-head a {
+    font-size: 0.9rem;
+    text-decoration: none;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
+    gap: 1.25rem;
+    margin-top: 1.5rem;
+  }
+</style>

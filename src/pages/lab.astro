@@ -1,0 +1,74 @@
+---
+import Base from '../layouts/Base.astro';
+import RobotDemo from '../components/three/RobotDemo.astro';
+---
+
+<Base title="Lab" description="Interactive robotics experiments that run entirely in the browser.">
+  <div class="container page">
+    <header class="narrow-head">
+      <p class="eyebrow">Lab</p>
+      <h1>Interactive experiments</h1>
+      <p class="lede">Simulations that run entirely in your browser. No server, no install.</p>
+    </header>
+
+    <RobotDemo height="clamp(22rem, 60vh, 38rem)" />
+
+    <div class="prose explainer">
+      <h2>Rover in an arena</h2>
+      <p>
+        A small differential-drive robot lives in a walled arena with two pillars, some crates and balls. The physics run
+        in <a href="https://github.com/google-deepmind/mujoco/tree/main/wasm">MuJoCo compiled to WebAssembly</a> at 250 Hz,
+        rendered with three.js. Click the floor and the rover drives there. Click a crate or ball to kick it.
+      </p>
+      <ul>
+        <li>
+          <strong>Sensing.</strong> A lidar on top casts 15 rays across 210°. Rays only see walls and pillars, so the rover
+          treats crates and balls as things to push rather than avoid. Red rays are hits.
+        </li>
+        <li>
+          <strong>Steering.</strong> Every 20 ms it picks the free direction closest to its goal, with a small bonus for
+          keeping its previous choice so it commits to one side of an obstacle. Speed drops as the way ahead narrows.
+        </li>
+        <li>
+          <strong>Recovery.</strong> If it pushes forward without moving for a second, it backs out while turning. After a
+          few failed attempts it gives up on the goal and wanders somewhere else.
+        </li>
+      </ul>
+      <p>
+        The controller is a hand-written reactive policy, not a learned one. Swapping in a trained policy exported to ONNX
+        is the natural next experiment.
+      </p>
+    </div>
+  </div>
+</Base>
+
+<style>
+  .page {
+    padding-top: clamp(2rem, 6vw, 4rem);
+  }
+
+  .narrow-head {
+    max-width: var(--measure);
+    margin-bottom: 1.5rem;
+  }
+
+  h1 {
+    font-size: clamp(1.9rem, 5vw, 2.5rem);
+    letter-spacing: -0.02em;
+    margin: 0.3rem 0 0.5rem;
+  }
+
+  .lede {
+    color: var(--muted);
+    margin: 0;
+  }
+
+  .explainer {
+    max-width: var(--measure);
+    margin-top: 2rem;
+  }
+
+  .explainer h2 {
+    margin-top: 1rem;
+  }
+</style>

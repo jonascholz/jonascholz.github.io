@@ -1,0 +1,20 @@
+---
+/** A row of `<Param>` controls under a figure. */
+---
+
+<div class="controls"><slot /></div>
+
+<style>
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: end;
+    gap: 1rem 1.5rem;
+    margin-block: 1.25rem;
+    padding: 0.9rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+  }
+</style>

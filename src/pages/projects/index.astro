@@ -1,0 +1,87 @@
+---
+import Base from '../../layouts/Base.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+import { getProjects, getPublications } from '../../lib/content';
+import { formatDate } from '../../lib/site';
+
+const projects = await getProjects();
+const publications = await getPublications();
+---
+
+<Base title="Projects" description="Research projects and publications.">
+  <div class="container page">
+    <header>
+      <p class="eyebrow">Projects</p>
+      <h1>Things I worked on</h1>
+    </header>
+    <div class="grid">
+      {projects.map((p) => <ProjectCard project={p} />)}
+    </div>
+
+    <h2>Publications</h2>
+    <ul class="pubs">
+      {
+        publications.map((p) => (
+          <li>
+            <a href={p.data.permalink}>{p.data.title}</a>
+            <span>
+              {p.data.venue} · {formatDate(p.data.date)}
+            </span>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</Base>
+
+<style>
+  .page {
+    padding-top: clamp(2rem, 6vw, 4rem);
+  }
+
+  h1 {
+    font-size: clamp(1.9rem, 5vw, 2.5rem);
+    letter-spacing: -0.02em;
+    margin: 0.3rem 0 2rem;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
+    gap: 1.25rem;
+  }
+
+  h2 {
+    font-size: 1.3rem;
+    margin: 3.5rem 0 1rem;
+  }
+
+  .pubs {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .pubs li {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding-block: 0.9rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .pubs a {
+    font-weight: 550;
+    color: var(--fg);
+    text-decoration: none;
+  }
+
+  .pubs a:hover {
+    color: var(--accent);
+  }
+
+  .pubs span {
+    font-size: 0.88rem;
+    color: var(--muted);
+  }
+</style>

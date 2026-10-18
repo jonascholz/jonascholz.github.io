@@ -1,0 +1,31 @@
+---
+/**
+ * Shows its content only while a page param equals `value`.
+ * Mark the blocks that are not shown initially with `hidden`.
+ *
+ *   <Show param="surrogate" value="boxcar" hidden> ... </Show>
+ */
+interface Props {
+  param: string;
+  value: string;
+  hidden?: boolean;
+}
+
+const { param, value, hidden = false } = Astro.props;
+---
+
+<div data-show-param={param} data-show-value={value} hidden={hidden}><slot /></div>
+
+<script>
+  import { getParam, subscribe } from '../diagrams/lib/params';
+
+  for (const el of document.querySelectorAll<HTMLElement>('[data-show-param]')) {
+    const param = el.dataset.showParam!;
+    const sync = () => {
+      const v = getParam(param);
+      if (v !== undefined) el.hidden = String(v) !== el.dataset.showValue;
+    };
+    subscribe([param], sync);
+    sync();
+  }
+</script>

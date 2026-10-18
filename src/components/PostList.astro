@@ -1,0 +1,120 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { Image } from 'astro:assets';
+import { formatDate } from '../lib/site';
+
+interface Props {
+  posts: CollectionEntry<'posts'>[];
+  /** Show the teaser image next to each entry. */
+  thumbnails?: boolean;
+}
+
+const { posts, thumbnails = true } = Astro.props;
+---
+
+<ul class="post-list">
+  {
+    posts.map((p) => (
+      <li>
+        <a href={p.data.permalink} class="post-link">
+          <div class="text">
+            <p class="meta">
+              <time datetime={p.data.date.toISOString()}>{formatDate(p.data.date)}</time>
+              {p.data.draft && <span class="tag">Draft</span>}
+            </p>
+            <h3>{p.data.title}</h3>
+            {p.data.description && <p class="description">{p.data.description}</p>}
+            <p class="tags">
+              {p.data.tags.map((t) => (
+                <span class="tag">{t}</span>
+              ))}
+            </p>
+          </div>
+          {thumbnails && p.data.image && (
+            <Image src={p.data.image} alt="" width={320} class="thumb" loading="lazy" />
+          )}
+        </a>
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .post-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .post-list li + li {
+    border-top: 1px solid var(--border);
+  }
+
+  .post-link {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 1.5rem;
+    align-items: center;
+    padding-block: 1.4rem;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .post-link:hover h3 {
+    color: var(--accent);
+  }
+
+  .meta,
+  .description,
+  .tags {
+    margin: 0;
+  }
+
+  .meta {
+    display: flex;
+    gap: 0.6rem;
+    align-items: center;
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+
+  h3 {
+    font-size: 1.2rem;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+    margin: 0.25rem 0 0.4rem;
+    transition: color 0.15s;
+  }
+
+  .description {
+    color: var(--muted);
+    font-size: 0.95rem;
+    line-height: 1.55;
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-top: 0.7rem;
+  }
+
+  .thumb {
+    width: 9rem;
+    height: 6rem;
+    object-fit: contain;
+    border-radius: 8px;
+    background: #fff;
+    border: 1px solid var(--border);
+  }
+
+  @media (max-width: 36rem) {
+    .post-link {
+      grid-template-columns: 1fr;
+    }
+
+    .thumb {
+      display: none;
+    }
+  }
+</style>

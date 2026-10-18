@@ -1,0 +1,83 @@
+---
+/**
+ * The MuJoCo rover demo as an island. MDX and pages use this wrapper because
+ * hydration directives need a statically imported framework component.
+ * Loads (React, three.js, then ~2.6 MB of gzipped WebAssembly) only once visible.
+ */
+import RoverDemo from './RoverDemo';
+
+interface Props {
+  height?: string;
+}
+
+const { height } = Astro.props;
+---
+
+<RoverDemo client:visible height={height} />
+
+<style is:global>
+  .rover-demo {
+    position: relative;
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    background:
+      radial-gradient(ellipse at 50% 40%, var(--surface) 0%, var(--surface-2) 100%);
+    touch-action: none;
+  }
+
+  .rover-demo canvas {
+    display: block;
+  }
+
+  .rover-hud {
+    position: absolute;
+    inset: auto 0 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem 1rem;
+    padding: 0.6rem 0.9rem;
+    font: 500 0.78rem var(--font-sans);
+    color: var(--muted);
+    background: linear-gradient(to top, color-mix(in srgb, var(--bg) 92%, transparent), transparent);
+    pointer-events: none;
+  }
+
+  .rover-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    color: var(--fg);
+  }
+
+  .rover-status .dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: #3ddc84;
+    box-shadow: 0 0 0 3px color-mix(in srgb, #3ddc84 25%, transparent);
+  }
+
+  .rover-help {
+    flex: 1;
+  }
+
+  .rover-hud button {
+    pointer-events: auto;
+    font: inherit;
+    color: var(--fg);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.2rem 0.6rem;
+    cursor: pointer;
+  }
+
+  @media (max-width: 34rem) {
+    .rover-help {
+      display: none;
+    }
+  }
+</style>
