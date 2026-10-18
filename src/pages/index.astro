@@ -14,13 +14,9 @@ const projects = await getProjects();
   <section class="hero">
     <div class="dot-grid backdrop" aria-hidden="true"></div>
     <div class="container hero-inner">
-      <p class="status"><span class="pulse" aria-hidden="true"></span>PhD at KIT · generalist robots</p>
-      <h1>
-        Jona Scholz
-        <span>Toward generalist robots.</span>
-      </h1>
+      <h1>Jona Scholz</h1>
       <p class="lede">
-        I'm a researcher at <a href={site.affiliation.url}>ITIV, Karlsruhe Institute of Technology</a>. Before robots I spent
+        I'm a PhD student at <a href={site.affiliation.url}>ITIV, Karlsruhe Institute of Technology</a>. Before robots I spent
         a good while trying to make spiking neural networks learn. This site collects random notes from stuff I'm working
         on.
       </p>
@@ -80,44 +76,6 @@ const projects = await getProjects();
     padding-block: clamp(3rem, 9vw, 6.5rem) clamp(2rem, 5vw, 3.5rem);
   }
 
-  .status {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.6rem;
-    margin: 0 0 1.6rem;
-    padding: 0.3rem 0.8rem 0.3rem 0.65rem;
-    border: 1px solid var(--border);
-    border-radius: 999px;
-    background: var(--surface);
-    font-family: var(--font-mono);
-    font-size: 0.75rem;
-    color: var(--muted);
-  }
-
-  .pulse {
-    width: 0.45rem;
-    height: 0.45rem;
-    border-radius: 50%;
-    background: #22c55e;
-    box-shadow: 0 0 0 0 rgb(34 197 94 / 0.5);
-    animation: pulse 2.4s infinite;
-  }
-
-  @keyframes pulse {
-    70% {
-      box-shadow: 0 0 0 7px rgb(34 197 94 / 0);
-    }
-    100% {
-      box-shadow: 0 0 0 0 rgb(34 197 94 / 0);
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .pulse {
-      animation: none;
-    }
-  }
-
   h1 {
     font-size: clamp(2.6rem, 7vw, 4.6rem);
     font-weight: 660;
@@ -126,16 +84,8 @@ const projects = await getProjects();
     margin: 0;
   }
 
-  h1,
-  h1 span {
+  h1 {
     text-wrap: pretty;
-  }
-
-  h1 span {
-    display: block;
-    font-size: 0.8em;
-    margin-top: 0.12em;
-    color: var(--faint);
   }
 
   .lede {
