@@ -7,13 +7,14 @@ const posts = await getPosts();
 const years = [...new Set(posts.map((p) => p.data.date.getUTCFullYear()))];
 ---
 
-<Base title="Blog" description="Notes and tutorials on robot learning, deep learning and spiking neural networks.">
+<Base title="Blog" description="Notes and tutorials on spiking neural networks, deep learning and robots.">
   <div class="container narrow page">
     <header>
       <p class="eyebrow">Blog</p>
       <h1 class="page-title">Notes and tutorials</h1>
       <p class="page-lede">
-        Derivations worked out step by step, mostly on training spiking neural networks.
+        Things I figured out and wrote down, usually step by step with the math spelled out. So far mostly spiking neural
+        networks; robot posts are on the way.
       </p>
     </header>
     {
