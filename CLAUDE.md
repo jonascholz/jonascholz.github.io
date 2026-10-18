@@ -6,7 +6,7 @@ The site is built with Astro (static output, deployed to GitHub Pages by `.githu
 
 - `src/content/posts/<date>-<name>/index.mdx`: one folder per blog post, with its images and videos next to it. The `permalink` in the front matter is the public URL. `draft: true` hides a post from production builds (it still shows in `npm run dev`).
 - `src/content/projects/<name>/index.mdx`, `src/content/publications/*.md`: same idea for projects and publications. Projects also support `draft: true`.
-- `src/pages/`: the routes (home, blog index, projects, CV at `/cv/`, RSS at `/feed.xml`). The Lab page is hidden for now as `src/pages/_lab.astro` (files starting with `_` are not built).
+- `src/pages/`: the routes (home, blog index, projects, CV at `/cv/`). The Lab page is hidden for now as `src/pages/_lab.astro` (files starting with `_` are not built).
 - `src/diagrams/<name>.ts`: SVG diagrams and plots, one module per figure. Shared code lives in `src/diagrams/lib/` (SVG builder, plotting panels, param store).
 - `src/lib/palette.ts`: the single source of truth for variable colors, used by both equations and diagrams.
 - `src/components/three/`: the MuJoCo + three.js robot demo (`RobotDemo`). Currently not shown anywhere; its home page section is commented out in `src/pages/index.astro`.

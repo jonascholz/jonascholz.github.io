@@ -3,6 +3,7 @@ import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import profile from '../assets/profile.jpg';
 import { site } from '../lib/site';
+import Email from '../components/Email.astro';
 
 const education = [
   { what: 'PhD at the Institut für Technik der Informationsverarbeitung (ITIV), KIT', when: 'ongoing' },
@@ -41,9 +42,9 @@ const work = [
       <Image src={profile} alt="Jona Scholz" width={400} height={400} class="photo" loading="eager" />
       <div>
         <h1 class="page-title">Hi, I'm Jona</h1>
-        <p>I'm working towards AGI. I wasted some time on SNNs and then went into generalist robots. Prior to this I was a Software Developer.</p>
+        <p>I'm trying to build a cheap generalist robot for household tasks. Before that I wasted some time on SNNs, and prior to this I was a Software Developer.</p>
         <p class="contact">
-          <a href={`mailto:${site.email}`}>{site.email}</a>
+          <Email />
           {site.links.map((l) => <a href={l.url} rel="me noopener">{l.label}</a>)}
         </p>
       </div>
