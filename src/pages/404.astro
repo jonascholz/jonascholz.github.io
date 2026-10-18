@@ -1,11 +1,41 @@
 ---
 import Base from '../layouts/Base.astro';
+import AhaRobot from '../components/sketches/AhaRobot.astro';
 ---
 
 <Base title="Page not found">
-  <div class="container narrow" style="padding-top:4rem">
-    <p class="eyebrow">404</p>
-    <h1>Page not found</h1>
-    <p>Sorry, but the page you were trying to view does not exist. Try the <a href="/blog/">list of posts</a>.</p>
+  <div class="container narrow page">
+    <div>
+      <p class="eyebrow">404</p>
+      <h1 class="page-title">Page not found</h1>
+      <p class="page-lede">
+        Sorry, but the page you were trying to view does not exist. Try the <a href="/blog/">list of posts</a>.
+      </p>
+    </div>
+    <AhaRobot class="lost" />
   </div>
 </Base>
+
+<style>
+  .page {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    padding-block: clamp(3rem, 9vw, 6rem);
+  }
+
+  /* Leaning over, looking for the page. */
+  .page :global(.lost) {
+    flex-shrink: 0;
+    width: clamp(7rem, 20vw, 11rem);
+    transform: rotate(9deg);
+  }
+
+  @media (max-width: 34rem) {
+    .page {
+      flex-direction: column-reverse;
+      align-items: flex-start;
+    }
+  }
+</style>
