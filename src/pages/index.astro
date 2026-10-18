@@ -2,7 +2,7 @@
 import Base from '../layouts/Base.astro';
 import PostList from '../components/PostList.astro';
 import ProjectCard from '../components/ProjectCard.astro';
-import RobotDemo from '../components/three/RobotDemo.astro';
+// Hidden for now: import RobotDemo from '../components/three/RobotDemo.astro';
 import { getPosts, getProjects } from '../lib/content';
 import { site } from '../lib/site';
 
@@ -30,6 +30,7 @@ const projects = await getProjects();
       </p>
     </div>
 
+    {/* Hidden for now: live robot demo.
     <div class="container">
       <figure class="demo">
         <RobotDemo height="clamp(22rem, 46vw, 34rem)" />
@@ -39,6 +40,7 @@ const projects = await getProjects();
         </figcaption>
       </figure>
     </div>
+    */}
   </section>
 
   <section class="container section">
