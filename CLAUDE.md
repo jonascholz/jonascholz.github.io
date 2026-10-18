@@ -1,4 +1,4 @@
-This is a personal website, mostly used as a research blog. The focus is now AI for robotics (world models, robot learning); older posts are about deep learning and spiking neural networks.
+This is a personal website, mostly used as a research blog. The focus is now AI for robotics (generalist robots, robot learning); older posts are about deep learning and spiking neural networks.
 
 The site is built with Astro (static output, deployed to GitHub Pages by `.github/workflows/deploy.yml` on every push to `master`). Run `npm run dev` for a local server, `npm run build` for a production build and `npm run check` for type checking.
 
