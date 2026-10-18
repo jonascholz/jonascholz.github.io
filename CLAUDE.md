@@ -58,3 +58,7 @@ Math is rendered at build time by MathJax (`src/lib/rehype-mathjax.ts`); nothing
 ## General Notes
 
 Don't use em-dashes. Use commas or restructure your sentences. When writing in the markdown files, the math notation has to conform to the stated rules and to the style of the document. However, when replying to the user in a chat window, there is no rendering support for math.
+
+## Workflow
+
+Open a pull request for each change and merge it yourself once it is ready (type check, build and CI green). No need to ask first.
