@@ -1,0 +1,30 @@
+---
+import { render } from 'astro:content';
+import Article from '../../layouts/Article.astro';
+import { getProjects, mdxComponents, readingTime, routeParam } from '../../lib/content';
+
+export async function getStaticPaths() {
+  return (await getProjects()).map((project) => ({
+    params: { slug: routeParam(project.data.permalink, 'projects') },
+    props: { project },
+  }));
+}
+
+const { project } = Astro.props;
+const { Content, headings } = await render(project);
+const { title, description, tags, image, references } = project.data;
+---
+
+<Article
+  title={title}
+  description={description}
+  tags={tags}
+  image={image?.src}
+  readingTime={readingTime(project)}
+  references={references}
+  eyebrow="Project"
+  headings={headings}
+  back={{ label: 'Projects', href: '/projects/' }}
+>
+  <Content components={mdxComponents} />
+</Article>

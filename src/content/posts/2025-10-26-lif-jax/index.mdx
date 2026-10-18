@@ -1,0 +1,242 @@
+---
+title: Implementing a LIF in JAX
+description: We code up a simple LIF implementation in JAX. Make sure to read the theory first.
+image: ./lif_jax.png
+date: 2025-11-02
+permalink: /posts/2025/10/lif-jax/
+tags:
+  - JAX
+  - SNN
+  - Tutorial
+  - LIF
+---
+
+In the [last tutorial](/posts/2025/10/lif-theory/) we looked at the theory of implementing a LIF neuron. Now we will put it into code with JAX.
+
+If you are unfamiliar with JAX, you can think of it as a fancy numpy for the scope of this tutorial. In the future we will see that it also does autodiff and other things.
+
+## Quick refresher
+As we recall, the LIF's state $\cU{U[t]}$ is governed by the following equation:
+
+$$
+\begin{aligned}
+\cU{U[t]} &= \underbrace{\calpha{\alpha} \cU{U[t-1]}}_{\text{decayed state}} + \underbrace{\cWin{W} \cX{X[t]}}_{\text{weighted input}} - \underbrace{\cS{S[t-1]} \ctheta{\theta}}_{\text{reset}}
+\end{aligned}
+$$
+
+Additionally, the firing mechanism is defined as:
+
+$$
+\cS{S[t]} = \underbrace{\Theta}_{\text{heaviside}}(\cU{U[t]} - \ctheta{\theta})
+$$
+
+## The basic architecture
+LIFs have a state, which changes at every timestep. They also have some parameters, such as their decay constant, which don't change as often.
+
+We need to track the state and the parameters somehow. We will also need a way to integrate inputs and calculate the next state. Let's draw these three distinct parts and call it an architecture.
+
+<figure id="fig:lif_architecture">
+<Diagram name="lif-architecture-diagram" />
+<figcaption><strong>Figure 1:</strong> LIF neuron architecture showing the separation between parameters (decay α, weight w, threshold θ), state (membrane potential u[t] and spike output s[t]), and the step function that processes inputs.</figcaption>
+</figure>
+
+JAX is built around pure functions. In other programming languages you think of neurons as objects that change over time. In JAX there is no such thing. Instead we run a function on a state to receive a new state. Importantly, the function doesn't keep track of anything, it just transforms one state to another. Avoiding side-effects makes a function pure and it goes against much of modern object-oriented programming.
+
+## Putting it into code
+Let's start with the parameters that define our LIFs. There will be more than one LIF in our layer and each one has its own decay constant $\calpha{\alpha}$. There is a shared weight matrix $\cWin{W}$, which gives us the incoming weights for every neuron. Finally, we also have the threshold $\ctheta{\theta}$.
+
+```python
+from typing import NamedTuple
+from jax import Array
+import jax.numpy as jnp
+
+class LIFParams(NamedTuple):
+    alpha: Array
+    W: Array
+    theta: Array
+```
+
+There is some significance in JAX to using so-called PyTrees like the NamedTuple. These are just objects such as lists or tuples that can easily be traversed, which will be important for vectorization and gradients.
+
+If you are unfamiliar with NamedTuples, here's an example of initializing our LIFParams:
+
+```python
+import jax.numpy as jnp
+
+alpha = jnp.array([0.9])
+W = jnp.array([[0.4]])
+theta = jnp.array([1.0])
+params = LIFParams(alpha, W, theta)
+print(params)
+```
+```console
+LIFParams(alpha=Array([0.9], dtype=float32), W=Array([[0.4]], dtype=float32), theta=Array([1.], dtype=float32))
+```
+
+Note that we have assumed here that the layer consists of a single neuron with 1 input. As a result, the $\calpha{\alpha}$ and $\ctheta{\theta}$ are 1-dimensional arrays, and $\cWin{W}$ is a 1x1 matrix.
+
+These parameters don't change during inference, but the state does. Let's implement it.
+
+```python
+class LIFState(NamedTuple):
+    u: Array
+    spike: Array
+
+u = jnp.array([0.0])
+spike = jnp.array([0.0])
+state = LIFState(u, spike)
+print("current state", state)
+```
+```console
+current state LIFState(u=Array([0.], dtype=float32), spike=Array([0.], dtype=float32))
+```
+
+So now we have the membrane potential U[t] and whether or not each neuron spikes S[t]. Looking back at Figure 1, we only need a function to update the neurons state now.
+
+```python
+def lif_step(
+    params: LIFParams,
+    state: LIFState,
+    inputs: jnp.ndarray,
+):
+    decayed_state = params.alpha * state.u
+    weighted_input = inputs @ params.W
+    reset = state.spike * params.theta
+    u_new = decayed_state + weighted_input - reset
+    spike = jnp.heaviside(u_new - params.theta, 0)
+
+    return LIFState(u=u_new, spike=spike)
+```
+
+We take in the new input and the state, as well as the parameters. From this we calculate the next state. Great, let's use it. 
+
+```python
+inputs = jnp.array([1])
+new_state = lif_step(params, state, inputs)
+print("new state", new_state)
+```
+```console
+new state LIFState(u=Array([0.4], dtype=float32), spike=Array([0.], dtype=float32))
+```
+
+It works! Now let's see how it behaves when we generate some random spikes with a probability of 15% and watch the state.
+
+```python
+from jax import random
+
+current_state = LIFState(u=jnp.array([0.0]), spike=jnp.array([0.0]))
+key = random.PRNGKey(3)
+n_steps = 100
+inputs = random.bernoulli(key, p=0.15, shape=(n_steps, 1))
+
+# NOTE this is an inefficient way of doing it, we will improve it shortly
+state_history = []
+for i in range(n_steps):
+    current_state = lif_step(params, current_state, inputs[i])
+    state_history.append(current_state)
+```
+
+Okay so we have a history of states. You can prompt an LLM of your choice to plot that, or you can use my function, which also comes from an LLM:
+
+```python
+import matplotlib.pyplot as plt
+
+def plot_lif_simulation(state_history, inputs, params: LIFParams, filename: str = 'lif_simulation.svg'):
+    """
+    Create a 3-part plot showing:
+    1. Membrane potential over time
+    2. Incoming spikes
+    3. Outgoing spikes
+
+    Args:
+        state_history: List of LIFState objects
+        inputs: Array of input spikes (n_steps, n_inputs)
+        params: LIFParams containing theta for threshold line
+        filename: Output filename for the plot
+    """
+    # Extract data for plotting
+    u_history = jnp.array([s.u[0] for s in state_history])
+    spike_history = jnp.array([s.spike[0] for s in state_history])
+    input_spikes = inputs.squeeze()
+    n_steps = len(state_history)
+
+    # Create 3-part plot with aligned time axes
+    _, axes = plt.subplots(3, 1, figsize=(12, 8), sharex=True)
+    time_steps = jnp.arange(n_steps)
+
+    # Plot membrane potential
+    axes[0].plot(time_steps, u_history, 'b-', linewidth=1.5)
+    axes[0].axhline(y=params.theta[0], color='r', linestyle='--', label='Threshold')
+    axes[0].set_ylabel('Membrane Potential (u)', fontsize=11)
+    axes[0].legend()
+    axes[0].grid(True, alpha=0.3)
+
+    # Plot incoming spikes
+    axes[1].axhline(y=0, color='gray', linewidth=1, alpha=0.7)
+    spike_times_in = time_steps[input_spikes > 0]
+    axes[1].vlines(spike_times_in, 0, 0.8, colors='green', linewidths=2)
+    axes[1].set_ylabel('Incoming Spikes', fontsize=11)
+    axes[1].set_ylim([-0.1, 1])
+    axes[1].set_yticks([])
+    axes[1].spines['top'].set_visible(False)
+    axes[1].spines['right'].set_visible(False)
+    axes[1].spines['left'].set_visible(False)
+    axes[1].grid(True, alpha=0.3, axis='x')
+
+    # Plot outgoing spikes
+    axes[2].axhline(y=0, color='gray', linewidth=1, alpha=0.7)
+    spike_times_out = time_steps[spike_history > 0]
+    axes[2].vlines(spike_times_out, 0, 0.8, colors='red', linewidths=2)
+    axes[2].set_ylabel('Outgoing Spikes', fontsize=11)
+    axes[2].set_xlabel('Time Step', fontsize=11)
+    axes[2].set_ylim([-0.1, 1])
+    axes[2].set_yticks([])
+    axes[2].spines['top'].set_visible(False)
+    axes[2].spines['right'].set_visible(False)
+    axes[2].spines['left'].set_visible(False)
+    axes[2].grid(True, alpha=0.3, axis='x')
+
+    plt.tight_layout()
+    plt.savefig(filename, dpi=150, bbox_inches='tight')
+    print(f"Plot saved to {filename}")
+    plt.show()
+```
+
+Now let's plot our simulation:
+
+```python
+plot_lif_simulation(state_history, inputs, params)
+```
+
+<figure id="fig:lif_simulation">
+
+![LIF Simulation](./lif_simulation.svg)
+
+<figcaption><strong>Figure 2:</strong> LIF neuron simulation over 100 time steps showing the membrane potential (top), incoming spikes (middle), and outgoing spikes (bottom). The dashed red line indicates the firing threshold.</figcaption>
+</figure>
+
+Looks about right. Now we just have to optimize it a little and we can call it a day.
+
+## Optimizing with the scan method
+With the jax.lax scan method we can iterate over inputs much more efficiently. It does have some constraints and the syntax might look a bit weird. For a better introduction, I encourage you to check out https://www.nelsontang.com/blog/a-friendly-introduction-to-scan-with-jax
+
+For our purposes, just know that we write the function that gets executed at every step in the loop. We can carry forward a state, such as the state of our lif. In other scenarios it could be a mean or a sum. Additionally we have the option to append for the history object, in case the states along the way were important. We can usually leave this empty.
+
+```python
+from jax.lax import scan
+from functools import partial
+
+def lif_scan_wrapper(params: LIFParams, state: LIFState, inputs: jnp.ndarray):
+    new_state = lif_step(params, state, inputs)
+    return new_state, new_state  # carry, append_for_history
+
+bound_step = partial(lif_scan_wrapper, params)
+final_state, state_history = scan(bound_step, state, inputs)
+print("final state", final_state)
+```
+
+Note that the state history is no longer a list of states, but instead a LIFState where every property is now an array of all the values over time. Again, it's a bit weird, but feel free to print some values to get a feel for it.
+
+## Download the Full Notebook
+
+You can get the full code as a Jupyter notebook here: [lif_jax.ipynb](/files/lif_jax.ipynb)

@@ -1,42 +1,25 @@
+# jonascholz.github.io
 
-# What is this
+Personal site and research blog of Jona Scholz, built with [Astro](https://astro.build) and deployed to GitHub Pages.
 
-![pages-build-deployment](https://github.com/academicpages/academicpages.github.io/actions/workflows/pages/pages-build-deployment/badge.svg)
+- Posts and projects are MDX files in `src/content/`, with equations rendered at build time by MathJax.
+- Figures are TypeScript modules in `src/diagrams/` that render to static SVG; interactive ones re-render when their controls change.
+- The 3D demo runs [MuJoCo](https://github.com/google-deepmind/mujoco/tree/main/wasm) (WebAssembly) with three.js / React Three Fiber.
 
-It's a fork of Academic Pages, which is a Github Pages template for academic websites. You can fork it yourself! You can even fork my version, but aware that I changed some things.
+## Local development
 
-Here are my changes:
-- different header style
-- name and short-bio are hidden on publications/cv page when user is on mobile
-- added birthdate variable in _config.yml and automatically calculated age on about.md
-- added icons for all the skills
-
-Since this thing doesn't seem to run on Windows I run it in WSL. Good luck setting that up if you never heard of it before.
-
-## Local execution (Linux)
-
-Bare necessities on Debian/Ubuntu:
+Requires Node.js 22.22 or newer (works on Linux, macOS and Windows; no Ruby needed).
 
 ```bash
-sudo apt update
-sudo apt install -y ruby-full build-essential
-sudo gem install bundler
+npm install
+npm run dev      # http://localhost:4321, drafts included
+npm run build    # production build into dist/
+npm run preview  # serve the production build
+npm run check    # type check
 ```
 
-Then install dependencies locally in the project and run the dev server:
+## Deployment
 
-```bash
-cd /home/affe/jonascholz.github.io
-bundle config set --local path 'vendor/bundle'
-bundle install
-```
+Every push to `master` runs `.github/workflows/deploy.yml`, which type checks, builds and publishes `dist/` to GitHub Pages. In the repository settings, **Settings → Pages → Build and deployment → Source** must be set to **GitHub Actions**.
 
-And finally run the thing:
-
-```bash
-bundle exec jekyll serve -H localhost
-```
-
-Open http://localhost:4000 in your browser. Jekyll will rebuild automatically when files change.
-
-You can still check the upstream setup notes at https://github.com/academicpages/academicpages.github.io.
+See `CLAUDE.md` for writing conventions (math, colors, citations, diagrams).

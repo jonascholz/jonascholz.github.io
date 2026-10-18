@@ -1,0 +1,364 @@
+---
+import '@fontsource-variable/geist';
+import '@fontsource-variable/geist-mono';
+import '../styles/global.css';
+import { paletteCss } from '../lib/palette';
+import { STYLESHEET_URL } from '../lib/mathjax';
+import { site } from '../lib/site';
+
+interface Props {
+  title?: string;
+  description?: string;
+  /** Absolute or root-relative URL of the social preview image. */
+  image?: string;
+  /** Load the MathJax stylesheet (pages with rendered math). */
+  math?: boolean;
+  type?: 'website' | 'article';
+}
+
+const { title, description = site.description, image, math = false, type = 'website' } = Astro.props;
+const fullTitle = title ? `${title} · ${site.name}` : site.title;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const ogImage = image ? new URL(image, Astro.site).href : undefined;
+const path = Astro.url.pathname;
+const isActive = (href: string) => path === href || (href !== '/' && path.startsWith(href));
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="alternate" type="application/rss+xml" title={site.name} href="/feed.xml" />
+    <meta name="theme-color" content="#fcfcfd" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#09090b" media="(prefers-color-scheme: dark)" />
+    <meta property="og:type" content={type} />
+    <meta property="og:title" content={title ?? site.title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    {ogImage && <meta property="og:image" content={ogImage} />}
+    <meta name="twitter:card" content={ogImage ? 'summary_large_image' : 'summary'} />
+    <meta name="generator" content={Astro.generator} />
+    <script is:inline>
+      try {
+        const t = localStorage.getItem('theme');
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+      } catch {}
+    </script>
+    <style is:inline set:html={paletteCss()} />
+    {math && <link rel="stylesheet" href={STYLESHEET_URL} />}
+    <slot name="head" />
+  </head>
+  <body>
+    <a class="skip visually-hidden" href="#main">Skip to content</a>
+    <header class="site-header">
+      <div class="bar">
+        <a class="brand" href="/" aria-label={`${site.name}, home`}>
+          <svg class="mark" viewBox="0 0 32 32" aria-hidden="true">
+            <rect x="1" y="1" width="30" height="30" rx="9"></rect>
+            <circle cx="12" cy="15" r="2.6"></circle>
+            <circle cx="20" cy="15" r="2.6"></circle>
+            <path d="M11 22h10"></path>
+          </svg>
+          <span>{site.name}</span>
+        </a>
+        <nav aria-label="Main">
+          <ul>
+            {
+              site.nav.map((item) => (
+                <li>
+                  <a href={item.href} aria-current={isActive(item.href) ? 'page' : undefined}>
+                    {item.label}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </nav>
+        <button class="theme-toggle" type="button" aria-label="Toggle dark mode" title="Toggle dark mode">
+          <svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true">
+            <path class="sun" d="M12 4V2M12 22v-2M4 12H2M22 12h-2M5.6 5.6 4.2 4.2M19.8 19.8l-1.4-1.4M5.6 18.4l-1.4 1.4M19.8 4.2l-1.4 1.4M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10Z"></path>
+            <path class="moon" d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <main id="main">
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-inner">
+        <div>
+          <a class="brand" href="/">{site.name}</a>
+          <p>{site.affiliation.name} · {site.location}</p>
+        </div>
+        <ul>
+          {
+            site.links.map((l) => (
+              <li>
+                <a href={l.url} rel="me noopener">
+                  {l.label}
+                </a>
+              </li>
+            ))
+          }
+          <li><a href={`mailto:${site.email}`}>Email</a></li>
+          <li><a href="/feed.xml">RSS</a></li>
+        </ul>
+      </div>
+    </footer>
+
+    <script>
+      const root = document.documentElement;
+      document.querySelector('.theme-toggle')?.addEventListener('click', () => {
+        const dark = root.dataset.theme
+          ? root.dataset.theme === 'dark'
+          : matchMedia('(prefers-color-scheme: dark)').matches;
+        const next = dark ? 'light' : 'dark';
+        const apply = () => {
+          root.dataset.theme = next;
+          try {
+            localStorage.setItem('theme', next);
+          } catch {}
+        };
+        // Cross-fade the theme switch where view transitions are available.
+        if ('startViewTransition' in document && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          document.startViewTransition(apply);
+        } else apply();
+      });
+
+      // Give the floating header a backdrop once the page scrolls under it.
+      const header = document.querySelector('.site-header');
+      const onScroll = () => header?.classList.toggle('scrolled', scrollY > 8);
+      addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+    </script>
+  </body>
+</html>
+
+<style>
+  .skip:focus {
+    position: fixed !important;
+    top: 0.5rem;
+    left: 0.5rem;
+    width: auto;
+    height: auto;
+    clip: auto;
+    padding: 0.5rem 1rem;
+    background: var(--surface);
+    z-index: 100;
+  }
+
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    padding: 0.75rem var(--gutter) 0;
+    view-transition-name: site-header;
+  }
+
+  .bar {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    max-width: var(--wide);
+    margin-inline: auto;
+    padding: 0.4rem 0.45rem 0.4rem 0.75rem;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    transition:
+      background 0.25s,
+      border-color 0.25s,
+      box-shadow 0.25s;
+  }
+
+  .scrolled .bar {
+    background: color-mix(in srgb, var(--surface) 78%, transparent);
+    border-color: var(--border);
+    box-shadow: var(--shadow);
+    backdrop-filter: saturate(1.6) blur(14px);
+    -webkit-backdrop-filter: saturate(1.6) blur(14px);
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    font-weight: 620;
+    letter-spacing: -0.015em;
+    color: var(--fg);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .mark {
+    width: 1.6rem;
+    height: 1.6rem;
+  }
+
+  .mark rect {
+    fill: var(--fg);
+  }
+
+  .mark circle {
+    fill: var(--bg);
+  }
+
+  .mark path {
+    stroke: var(--bg);
+    stroke-width: 2.2;
+    stroke-linecap: round;
+  }
+
+  nav {
+    margin-left: auto;
+  }
+
+  nav ul {
+    display: flex;
+    gap: 0.15rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  nav a {
+    display: block;
+    padding: 0.35rem 0.75rem;
+    border-radius: 999px;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition:
+      color 0.15s,
+      background 0.15s;
+  }
+
+  nav a:hover {
+    color: var(--fg);
+  }
+
+  nav a[aria-current='page'] {
+    color: var(--fg);
+    background: var(--surface-2);
+  }
+
+  .theme-toggle {
+    display: grid;
+    place-items: center;
+    width: 2.1rem;
+    height: 2.1rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--muted);
+    cursor: pointer;
+    transition: color 0.15s;
+  }
+
+  .theme-toggle:hover {
+    color: var(--fg);
+  }
+
+  .theme-toggle path {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .theme-toggle .moon {
+    display: none;
+  }
+
+  :global(:root[data-theme='dark']) .theme-toggle .sun {
+    display: none;
+  }
+
+  :global(:root[data-theme='dark']) .theme-toggle .moon {
+    display: inline;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :global(:root:not([data-theme='light'])) .theme-toggle .sun {
+      display: none;
+    }
+
+    :global(:root:not([data-theme='light'])) .theme-toggle .moon {
+      display: inline;
+    }
+  }
+
+  @media (max-width: 40rem) {
+    .site-header {
+      padding-inline: 0.6rem;
+    }
+
+    .bar {
+      gap: 0.4rem;
+      padding-left: 0.5rem;
+    }
+
+    .brand span {
+      display: none;
+    }
+
+    nav a {
+      padding-inline: 0.55rem;
+      font-size: 0.86rem;
+    }
+  }
+
+  main {
+    min-height: calc(100vh - 12rem);
+  }
+
+  .site-footer {
+    margin-top: 7rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.875rem;
+    color: var(--muted);
+  }
+
+  .footer-inner {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1.5rem;
+    padding-block: 2.5rem 3rem;
+  }
+
+  .footer-inner p {
+    margin: 0.35rem 0 0;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+  }
+
+  .footer-inner ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1.25rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .footer-inner ul a {
+    color: var(--muted);
+    text-decoration: none;
+  }
+
+  .footer-inner ul a:hover {
+    color: var(--fg);
+  }
+</style>

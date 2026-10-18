@@ -1,0 +1,26 @@
+---
+/**
+ * Dev-only preview of a single diagram: /dev/diagram/<name>/
+ * Optional query: ?props=<json> to pass static props. Not built in production.
+ */
+import Base from '../../../layouts/Base.astro';
+import Diagram from '../../../components/Diagram.astro';
+
+export function getStaticPaths() {
+  if (!import.meta.env.DEV) return [];
+  return Object.keys(import.meta.glob('../../../diagrams/*.ts')).map((p) => ({
+    params: { name: p.split('/').pop()!.replace(/\.ts$/, '') },
+  }));
+}
+
+const { name } = Astro.params;
+const raw = Astro.url.searchParams.get('props');
+const props = raw ? JSON.parse(raw) : {};
+---
+
+<Base title={`Diagram: ${name}`}>
+  <div class="container narrow prose" style="padding-top:2rem">
+    <p class="eyebrow">{name}</p>
+    <Diagram name={name!} props={props} />
+  </div>
+</Base>

@@ -1,0 +1,109 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { Image } from 'astro:assets';
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+}
+
+const { title, description, image, permalink, tags } = Astro.props.project.data;
+---
+
+<a href={permalink} class="card">
+  {
+    image && (
+      <div class="media">
+        <Image src={image} alt="" width={640} loading="lazy" />
+      </div>
+    )
+  }
+  <div class="body">
+    <h3>{title} <span class="arrow" aria-hidden="true">→</span></h3>
+    <p>{description}</p>
+    <p class="tags">{tags.slice(0, 3).map((t) => <span class="tag">{t}</span>)}</p>
+  </div>
+</a>
+
+<style>
+  .card {
+    display: flex;
+    flex-direction: column;
+    padding: 0.5rem;
+    border: 1px solid var(--border);
+    border-radius: calc(var(--radius) + 4px);
+    background: var(--surface);
+    color: inherit;
+    text-decoration: none;
+    transition:
+      border-color 0.2s,
+      box-shadow 0.2s,
+      transform 0.2s;
+  }
+
+  .card:hover {
+    border-color: var(--border-strong);
+    box-shadow: var(--shadow);
+    transform: translateY(-2px);
+  }
+
+  .media {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 16 / 10;
+    border-radius: var(--radius);
+    background: #fff;
+    overflow: hidden;
+  }
+
+  .media img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: transform 0.4s;
+  }
+
+  .card:hover .media img {
+    transform: scale(1.03);
+  }
+
+  .body {
+    padding: 0.9rem 0.6rem 0.6rem;
+  }
+
+  h3 {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+    font-size: 1.02rem;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    line-height: 1.35;
+    margin: 0 0 0.35rem;
+  }
+
+  .arrow {
+    color: var(--faint);
+    transition:
+      color 0.2s,
+      transform 0.2s;
+  }
+
+  .card:hover .arrow {
+    color: var(--fg);
+    transform: translateX(2px);
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-top: 0.85rem;
+  }
+</style>

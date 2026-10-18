@@ -1,0 +1,110 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { formatDate } from '../lib/site';
+
+interface Props {
+  posts: CollectionEntry<'posts'>[];
+}
+
+const { posts } = Astro.props;
+---
+
+<ul class="post-list">
+  {
+    posts.map((p) => (
+      <li>
+        <a href={p.data.permalink} class="post-link">
+          <time datetime={p.data.date.toISOString()}>{formatDate(p.data.date)}</time>
+          <div class="text">
+            <h3>
+              {p.data.title}
+              {p.data.draft && <span class="tag">Draft</span>}
+            </h3>
+            {p.data.description && <p>{p.data.description}</p>}
+          </div>
+          <span class="arrow" aria-hidden="true">
+            →
+          </span>
+        </a>
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .post-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .post-list li {
+    border-top: 1px solid var(--border);
+  }
+
+  .post-link {
+    display: grid;
+    grid-template-columns: 7.5rem 1fr auto;
+    gap: 1.5rem;
+    align-items: baseline;
+    padding-block: 1.35rem;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  time {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--faint);
+    white-space: nowrap;
+  }
+
+  h3 {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.12rem;
+    font-weight: 600;
+    line-height: 1.35;
+    letter-spacing: -0.015em;
+    margin: 0;
+    transition: color 0.15s;
+  }
+
+  p {
+    margin: 0.35rem 0 0;
+    color: var(--muted);
+    font-size: 0.95rem;
+    line-height: 1.55;
+  }
+
+  .arrow {
+    color: var(--faint);
+    transform: translateX(-4px);
+    opacity: 0;
+    transition:
+      opacity 0.15s,
+      transform 0.15s;
+  }
+
+  .post-link:hover h3 {
+    color: var(--accent);
+  }
+
+  .post-link:hover .arrow {
+    opacity: 1;
+    transform: none;
+  }
+
+  @media (max-width: 40rem) {
+    .post-link {
+      grid-template-columns: 1fr;
+      gap: 0.35rem;
+    }
+
+    .arrow {
+      display: none;
+    }
+  }
+</style>

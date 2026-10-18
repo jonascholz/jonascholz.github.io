@@ -1,0 +1,137 @@
+---
+title: The Batman Derivative
+description: An interactive look at how gradients flow through a single LIF neuron using surrogate gradients.
+image: ./batman_derivative.png
+date: 2026-03-12
+permalink: /posts/2026/03/lif-batman-derivative/
+tags:
+  - SNN
+  - Tutorial
+  - bptt
+---
+
+How do you pick the parameters of a LIF? What makes a good gradient? Is batman the right shape for a gradient? 
+
+First a brief reminder of the [BPTT post](/posts/2025/11/recurrent-bptt/), where we did the gradient math. Maybe your intuition is strong enough to understand the plots without it, but you have been warned.
+
+## Setup
+
+We have a single LIF neuron receiving a constant input $\cX{x}$ through a weight $\cWin{w} = 1$. The membrane potential evolves as:
+
+$$
+\begin{equation}
+\cU{U[t]} = \calpha{\alpha} \cU{U[t-1]} + \cWin{w} \cX{x} - \cS{S[t-1]} \ctheta{\theta}
+\label{eq:lif}
+\end{equation}
+$$
+
+The spike output is $\cS{S[t]} = \Theta(\cU{U[t]} - \ctheta{\theta})$, and we use a <Param name="surrogate" type="select" value="triangular" options={['triangular', 'boxcar']} /> surrogate gradient for the derivative of the Heaviside:
+
+<Show param="surrogate" value="triangular">
+
+$$
+\begin{equation}
+\tilde{\Theta}'(x) = \text{height} \cdot \max\left(0,\; 1 - \frac{\lvert x \rvert}{\text{width}}\right)
+\label{eq:surrogate}
+\end{equation}
+$$
+
+</Show>
+<Show param="surrogate" value="boxcar" hidden>
+
+$$
+\begin{equation}
+\tilde{\Theta}'(x) = \text{height} \cdot \mathbf{1}\!\left[\lvert x \rvert \leq \text{width}\right]
+\label{eq:surrogate-boxcar}
+\end{equation}
+$$
+
+</Show>
+
+<figure id="fig:triangular_surrogate">
+<Diagram name="triangular-surrogate-plot" />
+<figcaption><strong>Figure:</strong> Left: the Heaviside step function used in the forward pass. Right: the triangular surrogate gradient used in the backward pass.</figcaption>
+</figure>
+
+where $\text{height}$ = <Param name="height" type="number" value={1} min={0.1} max={5} step={0.1} /> scales the peak amplitude and $\text{width} = 0.5$ is the surrogate width. Using the chain rule, the spike derivative with respect to the input is:
+
+$$
+\begin{equation}
+\frac{\partial \cS{S[t]}}{\partial \cX{x}} = \tilde{\Theta}'(\cU{U[t]} - \ctheta{\theta}) \cdot \frac{\partial \cU{U[t]}}{\partial \cX{x}}
+\label{eq:spike_deriv}
+\end{equation}
+$$
+
+where the membrane derivative evolves recursively:
+
+$$
+\begin{equation}
+\frac{\partial \cU{U[t]}}{\partial \cX{x}} = \calpha{\alpha} \frac{\partial \cU{U[t-1]}}{\partial \cX{x}} + \cWin{w} - \frac{\partial \cS{S[t-1]}}{\partial \cX{x}} \ctheta{\theta}
+\label{eq:u_deriv}
+\end{equation}
+$$
+
+## Aside: Height of the surrogate
+I always thought of the heaviside activation as a very steep sigmoid. So maybe the sigmoid derivative has a height that we can use for our surrogate derivative.
+
+Unfortunately the sigmoid derivative seems to grow towards infinity. Feel free to play around with that below. I instead opted to choose a value that lines up with a different intuition, but we will get to that at the end.
+
+<figure id="fig:sigmoid_surrogate">
+<Diagram name="sigmoid-surrogate-plot" />
+<Controls>
+<Param name="k" type="range" label="k" value={1} min={0.1} max={10} step={0.1} digits={1} />
+</Controls>
+<figcaption><strong>Figure:</strong> Left: the sigmoid function σ(kx). Right: its derivative σ'(kx). Use the slider to adjust the steepness parameter k.</figcaption>
+</figure>
+
+## Interactive Plot
+
+The input is held constant for the first <Param name="cutoff" type="number" value={36} min={1} max={44} step={1} /> timesteps and then set to zero for the remaining steps. This cutoff is just to see how quickly the membrane potential decays.
+
+Use the sliders to adjust the input value $\cX{x}$, firing threshold $\ctheta{\theta}$, decay factor $\calpha{\alpha}$, and surrogate width $\text{width}$. The toggle controls whether the reset term $-\frac{\partial \cS{S[t-1]}}{\partial \cX{x}} \ctheta{\theta}$ is included in the gradient computation.
+
+<figure id="fig:lif_gradients">
+<Diagram name="lif-gradient-plot" />
+<figcaption><strong>Figure 1:</strong> Top: membrane potential (green) with threshold (dashed gray) and spike markers. Bottom: surrogate spike derivative ∂S/∂x over time.</figcaption>
+</figure>
+
+<Controls>
+<Param name="x" type="range" label="x" color="X" value={0.16} min={0.01} max={0.8} step={0.01} />
+<Param name="theta" type="range" label="θ" color="theta" value={0.5} min={0.1} max={1.5} step={0.05} />
+<Param name="alpha" type="range" label="α" color="alpha" value={0.8} min={0.2} max={0.99} step={0.01} />
+<Param name="width" type="range" label="width" color="delta" value={0.5} min={0.1} max={2} step={0.05} />
+<Param name="reset" type="checkbox" label="Reset term" value={true} />
+</Controls>
+
+<figure id="fig:lif_sweep">
+<Diagram name="lif-sweep-plot" />
+<figcaption><strong>Figure 2:</strong> Average spike derivative as a function of input value, sweeping $\cX{x} \in [-1, 1]$. The purple marker shows the current slider position.</figcaption>
+</figure>
+
+Figure 2 is pretty much the sum of the middle plot with the spike derivatives. 
+
+The output of network is the sum of its spikes, in this particular case. Thus the derivative is the sum of derivatives of every spike output with respect to the input current.
+
+## Analysis
+Now what should this gradient look like? The gradient is supposed to capture: how does the output change when the input changes? Let's see how the actual output looks for different inputs.
+
+<figure id="fig:lif_output">
+<Diagram name="lif-output-plot" />
+<figcaption><strong>Figure 3:</strong> Average firing rate (total spikes / timesteps) as a function of input value. The purple marker shows the current slider position.</figcaption>
+</figure>
+
+If this looks a lot like a ReLU, it's because standard MLPs are just simplified rate coded neurons. Our LIF neuron is using rate coding here (it's output value is the spike rate) and thus I'd argue they should have the same derivative. We can see this below.
+
+<figure id="fig:lif_rate_comparison">
+<Diagram name="lif-rate-comparison-plot" />
+<figcaption><strong>Figure 4:</strong> Left: the spiking neuron's firing rate (solid) approximates the analytical LIF transfer function (dashed). Right: the average surrogate gradient (solid) approximates the derivative of the LIF transfer function (dashed). Parameters: $\calpha{\alpha} = 0.96$, $\ctheta{\theta} = 0.5$, $\text{width} = 1$, $\text{height} = 0.15$.</figcaption>
+</figure>
+
+## Conclusion
+So in conclusion, if your LIF network is rate coded, it might make sense intuitively to model it after standard MLPs. You ought to choose the parameters in a way that the total derivative over time is mostly zero and sometimes one. The area of ones is between 0 and the LIF threshold.
+
+This is all just speculation though. And besides, rate coded LIFs might not be the way to go. Latency coding is much more efficient and really leverages the advantages of LIFs. We will look at that in some future blogpost.
+
+## Acknowledgements
+
+Thanks to [@Alex](https://alex-vasilache.github.io/) for coining the Batman derivative and for his input on how to shape gradients.
