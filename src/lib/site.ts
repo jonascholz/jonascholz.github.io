@@ -14,7 +14,7 @@ export const site = {
     { label: 'LinkedIn', url: 'https://www.linkedin.com/in/jona-scholz' },
   ],
   nav: [
-    { label: 'Writing', href: '/blog/' },
+    { label: 'Blog', href: '/blog/' },
     { label: 'Projects', href: '/projects/' },
     // Hidden for now: { label: 'Lab', href: '/lab/' },
     { label: 'About', href: '/cv/' },
