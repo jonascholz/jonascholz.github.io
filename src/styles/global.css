@@ -4,28 +4,31 @@
  */
 :root {
   color-scheme: light dark;
-  --bg: light-dark(#fcfcfd, #09090b);
-  --surface: light-dark(#ffffff, #111114);
-  --surface-2: light-dark(#f4f4f6, #18181c);
-  --fg: light-dark(#18181b, #ededf0);
-  --fg-2: light-dark(#3a3a42, #c9c9d1);
-  --muted: light-dark(#63636e, #9d9da8);
-  --faint: light-dark(#a1a1aa, #5f5f69);
-  --border: light-dark(#e6e6ea, #24242a);
-  --border-strong: light-dark(#d4d4da, #34343c);
-  --accent: light-dark(#4f46e5, #a5b4fc);
-  --accent-soft: light-dark(#eef0ff, #17173a);
-  --accent-line: light-dark(rgb(79 70 229 / 0.35), rgb(165 180 252 / 0.4));
-  --code-bg: light-dark(#f7f7f8, #111114);
-  --shadow-color: light-dark(rgb(24 24 27 / 0.06), rgb(0 0 0 / 0.5));
+  --bg: light-dark(#f4f7f1, #121713);
+  --surface: light-dark(#fbfdf9, #18201a);
+  --surface-2: light-dark(#e9efe5, #1e2720);
+  --fg: light-dark(#1f2a24, #e8efe6);
+  --fg-2: light-dark(#3a463f, #ccd8ca);
+  --muted: light-dark(#5d6b5b, #94a491);
+  --faint: light-dark(#a3b0a1, #5c6a5d);
+  --border: light-dark(#dde6d8, #26302a);
+  --border-strong: light-dark(#c9d6c3, #334037);
+  --accent: light-dark(#25744a, #7fd1a0);
+  --accent-soft: light-dark(#e2efe3, #17301f);
+  --accent-line: light-dark(rgb(37 116 74 / 0.35), rgb(127 209 160 / 0.4));
+  --code-bg: light-dark(#eef3eb, #161d18);
+  --shadow-color: light-dark(rgb(31 42 36 / 0.07), rgb(0 0 0 / 0.5));
   --shadow: 0 1px 2px var(--shadow-color), 0 8px 24px -8px var(--shadow-color);
+  /* Graph paper lines (major every 5 squares, minor in between). */
+  --grid-major: light-dark(rgb(46 110 70 / 0.17), rgb(180 230 200 / 0.09));
+  --grid-minor: light-dark(rgb(46 110 70 / 0.075), rgb(180 230 200 / 0.04));
 
   /* Diagrams (see src/diagrams/lib/svg.ts) */
-  --d-ink: light-dark(#2e2e33, #dcdce2);
-  --d-axis: light-dark(#6b6b75, #9d9da8);
-  --d-muted: light-dark(#a1a1aa, #6f6f79);
-  --d-grid: light-dark(#ececf0, #232329);
-  --d-paper: light-dark(#ffffff, #111114);
+  --d-ink: light-dark(#2b3530, #dbe5d8);
+  --d-axis: light-dark(#66745f, #9aa897);
+  --d-muted: light-dark(#a3b0a1, #66735f);
+  --d-grid: light-dark(#e3eadf, #222b24);
+  --d-paper: light-dark(#fbfdf9, #18201a);
   --d-node: light-dark(#eef4ff, #161d33);
 
   --font-sans: 'Geist Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
@@ -164,11 +167,64 @@ h3 {
   margin: 0;
 }
 
-/* Faint dot grid used behind hero sections. */
-.dot-grid {
-  background-image: radial-gradient(circle at 1px 1px, var(--border-strong) 1px, transparent 0);
-  background-size: 22px 22px;
-  mask-image: radial-gradient(ellipse 80% 70% at 50% 0%, #000 30%, transparent 75%);
+/* Graph paper behind hero sections, fading out toward the bottom. */
+.graph-paper {
+  background-image:
+    linear-gradient(to right, var(--grid-major) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-major) 1px, transparent 1px),
+    linear-gradient(to right, var(--grid-minor) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-minor) 1px, transparent 1px);
+  background-size:
+    110px 110px,
+    110px 110px,
+    22px 22px,
+    22px 22px;
+  background-position: -1px -1px;
+  mask-image: radial-gradient(ellipse 100% 90% at 50% 0%, #000 45%, transparent 90%);
+}
+
+/* Hand-drawn robot sketches (src/components/sketches). */
+.sketch .line,
+.sketch .thin,
+.sketch .link,
+.sketch .link-core,
+.sketch .steam {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.sketch .line {
+  stroke: var(--fg);
+  stroke-width: 2.2;
+}
+
+.sketch .thin {
+  stroke: var(--fg);
+  stroke-width: 1.4;
+}
+
+.sketch .link {
+  stroke: var(--fg);
+  stroke-width: 8;
+}
+
+.sketch .link-core {
+  stroke: var(--accent-soft);
+  stroke-width: 4.4;
+}
+
+.sketch .fill {
+  fill: var(--accent-soft);
+}
+
+.sketch .solid {
+  fill: var(--fg);
+}
+
+.sketch .steam {
+  stroke: var(--accent);
+  stroke-width: 1.6;
 }
 
 /* ---------- Prose (posts, projects, pages) ---------- */

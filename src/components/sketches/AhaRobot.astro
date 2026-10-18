@@ -1,0 +1,51 @@
+---
+/**
+ * Sketch of an AhaRobot: a lifting column on a wheeled base with two
+ * horizontal SCARA-style arms and a pan-tilt camera head. Not used yet.
+ * Line art in the hand-drawn style shared by all sketches (see .sketch in
+ * global.css): plain shapes, roughened by an SVG displacement filter.
+ */
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<svg class:list={['sketch', className]} viewBox="0 0 200 260" aria-hidden="true">
+  <defs>
+    <filter id="sketch-aharobot" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="9"></feTurbulence>
+      <feDisplacementMap in="SourceGraphic" scale="3.2"></feDisplacementMap>
+    </filter>
+  </defs>
+  <g filter="url(#sketch-aharobot)">
+    {/* base */}
+    <path class="fill" d="M48 210h104l6 22H42z"/>
+    <path class="line" d="M48 210h104l6 22H42z"/>
+    <circle class="line" cx="66" cy="236" r="13"/><circle class="line" cx="134" cy="236" r="13"/>
+    <circle class="thin" cx="66" cy="236" r="4"/><circle class="thin" cx="134" cy="236" r="4"/>
+    {/* lifting column */}
+    <path class="line" d="M91 210V44M109 210V44M91 44h18"/>
+    <path class="thin" d="M100 50V204"/>
+    {/* carriage */}
+    <rect class="fill" x="80" y="104" width="40" height="22" rx="3"/>
+    <rect class="line" x="80" y="104" width="40" height="22" rx="3"/>
+    {/* left scara arm */}
+    <path class="link" d="M80 113 52 119 28 110"/><path class="link-core" d="M80 113 52 119 28 110"/>
+    <circle class="fill" cx="52" cy="119" r="4"/><circle class="line" cx="52" cy="119" r="4"/>
+    <rect class="fill" x="21" y="106" width="13" height="10" rx="2"/><rect class="line" x="21" y="106" width="13" height="10" rx="2"/>
+    <path class="line" d="M24 116l-2 14M31 116l2 14"/>
+    {/* right scara arm */}
+    <path class="link" d="M120 113 148 119 172 110"/><path class="link-core" d="M120 113 148 119 172 110"/>
+    <circle class="fill" cx="148" cy="119" r="4"/><circle class="line" cx="148" cy="119" r="4"/>
+    <rect class="fill" x="166" y="106" width="13" height="10" rx="2"/><rect class="line" x="166" y="106" width="13" height="10" rx="2"/>
+    <path class="line" d="M169 116l-2 14M176 116l2 14"/>
+    {/* head on gimbal */}
+    <path class="line" d="M100 44V34"/>
+    <path class="line" d="M88 34h24"/>
+    <rect class="fill" x="80" y="14" width="40" height="18" rx="6"/>
+    <rect class="line" x="80" y="14" width="40" height="18" rx="6"/>
+    <circle class="solid" cx="92" cy="23" r="3.6"/><circle class="solid" cx="108" cy="23" r="3.6"/>
+  </g>
+</svg>
