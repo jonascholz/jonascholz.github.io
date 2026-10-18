@@ -1,0 +1,26 @@
+---
+/**
+ * Email link that keeps the address out of the HTML so scrapers can't
+ * harvest it. The mailto link is assembled in the browser on click.
+ */
+import { site } from '../lib/site';
+
+interface Props {
+  /** Link text; defaults to the address with "[at]" in place of "@". */
+  label?: string;
+}
+
+const { user, domain } = site.email;
+const { label = `${user} [at] ${domain}` } = Astro.props;
+---
+
+<a href="#" class="email-link" data-user={user} data-domain={domain}>{label}</a>
+
+<script>
+  for (const a of document.querySelectorAll<HTMLAnchorElement>('.email-link')) {
+    a.addEventListener('click', (e) => {
+      e.preventDefault();
+      location.href = `mailto:${a.dataset.user}@${a.dataset.domain}`;
+    });
+  }
+</script>

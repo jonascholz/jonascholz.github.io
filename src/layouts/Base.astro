@@ -5,6 +5,7 @@ import '../styles/global.css';
 import { paletteCss } from '../lib/palette';
 import { STYLESHEET_URL } from '../lib/mathjax';
 import { site } from '../lib/site';
+import Email from '../components/Email.astro';
 
 interface Props {
   title?: string;
@@ -109,7 +110,7 @@ const isActive = (href: string) => path === href || (href !== '/' && path.starts
               </li>
             ))
           }
-          <li><a href={`mailto:${site.email}`}>Email</a></li>
+          <li><Email label="Email" /></li>
           <li><a href="/feed.xml">RSS</a></li>
         </ul>
       </div>
@@ -353,12 +354,12 @@ const isActive = (href: string) => path === href || (href !== '/' && path.starts
     padding: 0;
   }
 
-  .footer-inner ul a {
+  .footer-inner ul :global(a) {
     color: var(--muted);
     text-decoration: none;
   }
 
-  .footer-inner ul a:hover {
+  .footer-inner ul :global(a:hover) {
     color: var(--fg);
   }
 </style>

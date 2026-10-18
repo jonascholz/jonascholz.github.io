@@ -4,7 +4,8 @@ export const site = {
   description:
     'PhD candidate at KIT working on generalist robots. Notes on robot learning, deep learning and spiking neural networks.',
   url: 'https://jonascholz.github.io',
-  email: 'jona.m.scholz@gmail.com',
+  // Split so the address never appears verbatim in the HTML (see Email.astro).
+  email: { user: 'jona.m.scholz', domain: 'gmail.com' },
   location: 'Karlsruhe, Germany',
   affiliation: { name: 'ITIV, Karlsruhe Institute of Technology', url: 'https://www.itiv.kit.edu/21_10571.php' },
   links: [
