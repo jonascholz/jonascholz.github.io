@@ -13,7 +13,7 @@ export async function getStaticPaths() {
 }
 
 const { post, prev, next } = Astro.props;
-const { Content } = await render(post);
+const { Content, headings } = await render(post);
 const { title, description, date, tags, image, references, draft } = post.data;
 ---
 
@@ -26,6 +26,8 @@ const { title, description, date, tags, image, references, draft } = post.data;
   readingTime={readingTime(post)}
   references={references}
   eyebrow={draft ? 'Draft' : undefined}
+  headings={headings}
+  back={{ label: 'Writing', href: '/blog/' }}
   prev={prev}
   next={next}
 >

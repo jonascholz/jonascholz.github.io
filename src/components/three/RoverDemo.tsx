@@ -4,7 +4,7 @@
  * Physics run in WebAssembly (official @mujoco/mujoco bindings), rendering in
  * three.js via React Three Fiber.
  */
-import { Canvas, useFrame, type ThreeEvent } from '@react-three/fiber';
+import { Canvas, useFrame, useThree, type ThreeEvent } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
@@ -58,6 +58,20 @@ function geometryFor(type: number, size: ArrayLike<number>): THREE.BufferGeometr
   }
 }
 
+const CAMERA: [number, number, number] = [0, 3.4, 2.75];
+
+/** Back the camera off on narrow (portrait) canvases so the whole arena stays in view. */
+function FitCamera() {
+  const camera = useThree((s) => s.camera);
+  const aspect = useThree((s) => s.size.width / s.size.height);
+  useEffect(() => {
+    const k = Math.max(1, 1.5 / aspect);
+    camera.position.set(CAMERA[0] * k, CAMERA[1] * k, CAMERA[2] * k);
+    camera.lookAt(0, 0, 0);
+  }, [aspect, camera]);
+  return null;
+}
+
 interface SceneProps {
   sim: RoverSim;
   dark: boolean;
@@ -80,8 +94,8 @@ function Scene({ sim, dark, onStatus }: SceneProps) {
       }),
     [model],
   );
-  const floorColor = dark ? '#1c2029' : '#ecebe6';
-  const wallColor = dark ? '#3a4150' : '#c9ccd4';
+  const floorColor = dark ? '#16161b' : '#efeff2';
+  const wallColor = dark ? '#33333d' : '#cfd0d8';
 
   const rayGeometry = useMemo(() => {
     const g = new THREE.BufferGeometry();
@@ -110,7 +124,7 @@ function Scene({ sim, dark, onStatus }: SceneProps) {
     sim.rays.forEach((ray, k) => {
       pos.setXYZ(2 * k, ...ray.from);
       pos.setXYZ(2 * k + 1, ...ray.to);
-      const c = ray.hit ? [1, 0.35, 0.3] : dark ? [0.35, 0.45, 0.6] : [0.55, 0.65, 0.8];
+      const c = ray.hit ? [1, 0.3, 0.25] : dark ? [0.45, 0.55, 0.75] : [0.3, 0.38, 0.55];
       col.setXYZ(2 * k, c[0], c[1], c[2]);
       col.setXYZ(2 * k + 1, c[0], c[1], c[2]);
     });
@@ -237,7 +251,7 @@ export default function RoverDemo({ height = '28rem' }: RoverDemoProps) {
           shadows
           dpr={[1, 2]}
           frameloop={visible ? 'always' : 'never'}
-          camera={{ position: [0, 3.9, 3.1], fov: 42, near: 0.05, far: 50 }}
+          camera={{ position: CAMERA, fov: 42, near: 0.05, far: 50 }}
           aria-label="Interactive 3D simulation of a rover robot. Click the floor to set a goal."
         >
           <ambientLight intensity={dark ? 0.55 : 0.8} />
@@ -251,11 +265,12 @@ export default function RoverDemo({ height = '28rem' }: RoverDemoProps) {
             shadow-camera-top={3}
             shadow-camera-bottom={-3}
           />
+          <FitCamera />
           <Scene sim={sim} dark={dark} onStatus={setStatus} />
           <OrbitControls
             enablePan={false}
             minDistance={1.5}
-            maxDistance={6}
+            maxDistance={9}
             maxPolarAngle={Math.PI / 2.2}
             target={[0, 0, 0]}
           />

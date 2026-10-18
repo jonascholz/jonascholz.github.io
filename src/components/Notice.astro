@@ -2,17 +2,33 @@
 /** A highlighted aside, e.g. "this post follows paper X". */
 ---
 
-<aside class="notice"><slot /></aside>
+<aside class="notice">
+  <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.5"></circle><path d="M10 9v5M10 6.2v.1"></path></svg>
+  <div><slot /></div>
+</aside>
 
 <style>
   .notice {
-    font-family: var(--font-sans);
-    font-size: 0.95rem;
+    display: flex;
+    gap: 0.8rem;
+    font-size: 0.93rem;
     line-height: 1.6;
-    background: var(--accent-soft);
-    border-left: 3px solid var(--accent);
-    border-radius: 0 8px 8px 0;
-    padding: 0.9rem 1.1rem;
+    color: var(--fg-2);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 0.95rem 1.1rem;
+  }
+
+  svg {
+    flex-shrink: 0;
+    width: 1.15rem;
+    height: 1.15rem;
+    margin-top: 0.15rem;
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 1.6;
+    stroke-linecap: round;
   }
 
   .notice :global(p) {

@@ -15,7 +15,7 @@ const { Content } = await render(publication);
 const { title, description, date, venue, paperurl } = publication.data;
 ---
 
-<Article title={title} description={description} date={date} eyebrow={`Publication · ${venue}`}>
-  <p><a href={paperurl}>Read the paper</a></p>
+<Article title={title} description={description} date={date} eyebrow="Publication" back={{ label: 'Projects', href: '/projects/' }}>
+  <p><strong>Venue:</strong> {venue} · <a href={paperurl}>Read the paper →</a></p>
   <Content />
 </Article>

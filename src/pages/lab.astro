@@ -7,8 +7,8 @@ import RobotDemo from '../components/three/RobotDemo.astro';
   <div class="container page">
     <header class="narrow-head">
       <p class="eyebrow">Lab</p>
-      <h1>Interactive experiments</h1>
-      <p class="lede">Simulations that run entirely in your browser. No server, no install.</p>
+      <h1 class="page-title">Interactive experiments</h1>
+      <p class="page-lede">Simulations that run entirely in your browser. No server, no install.</p>
     </header>
 
     <RobotDemo height="clamp(22rem, 60vh, 38rem)" />
@@ -44,23 +44,12 @@ import RobotDemo from '../components/three/RobotDemo.astro';
 
 <style>
   .page {
-    padding-top: clamp(2rem, 6vw, 4rem);
+    padding-top: clamp(3rem, 8vw, 5.5rem);
   }
 
   .narrow-head {
     max-width: var(--measure);
-    margin-bottom: 1.5rem;
-  }
-
-  h1 {
-    font-size: clamp(1.9rem, 5vw, 2.5rem);
-    letter-spacing: -0.02em;
-    margin: 0.3rem 0 0.5rem;
-  }
-
-  .lede {
-    color: var(--muted);
-    margin: 0;
+    margin-bottom: 2.5rem;
   }
 
   .explainer {

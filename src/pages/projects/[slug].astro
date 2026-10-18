@@ -11,7 +11,7 @@ export async function getStaticPaths() {
 }
 
 const { project } = Astro.props;
-const { Content } = await render(project);
+const { Content, headings } = await render(project);
 const { title, description, tags, image, references } = project.data;
 ---
 
@@ -23,6 +23,8 @@ const { title, description, tags, image, references } = project.data;
   readingTime={readingTime(project)}
   references={references}
   eyebrow="Project"
+  headings={headings}
+  back={{ label: 'Projects', href: '/projects/' }}
 >
   <Content components={mdxComponents} />
 </Article>

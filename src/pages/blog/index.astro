@@ -11,8 +11,8 @@ const years = [...new Set(posts.map((p) => p.data.date.getUTCFullYear()))];
   <div class="container narrow page">
     <header>
       <p class="eyebrow">Writing</p>
-      <h1>Notes and tutorials</h1>
-      <p class="lede">
+      <h1 class="page-title">Notes and tutorials</h1>
+      <p class="page-lede">
         Derivations worked out step by step, mostly on training spiking neural networks. Subscribe via <a href="/feed.xml">RSS</a>.
       </p>
     </header>
@@ -29,26 +29,18 @@ const years = [...new Set(posts.map((p) => p.data.date.getUTCFullYear()))];
 
 <style>
   .page {
-    padding-top: clamp(2rem, 6vw, 4rem);
+    padding-top: clamp(3rem, 8vw, 5.5rem);
   }
 
-  h1 {
-    font-size: clamp(1.9rem, 5vw, 2.5rem);
-    letter-spacing: -0.02em;
-    margin: 0.3rem 0 0.6rem;
-  }
-
-  .lede {
-    color: var(--muted);
-    margin: 0 0 2rem;
+  header {
+    margin-bottom: 1.5rem;
   }
 
   .year {
-    font-size: 0.9rem;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    font-weight: 500;
     color: var(--faint);
-    font-weight: 600;
-    margin: 2.5rem 0 0;
-    padding-bottom: 0.4rem;
-    border-bottom: 1px solid var(--border);
+    margin: 3rem 0 0.25rem;
   }
 </style>
