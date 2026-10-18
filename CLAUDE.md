@@ -9,7 +9,7 @@ The site is built with Astro (static output, deployed to GitHub Pages by `.githu
 - `src/pages/`: the routes (home, blog index, projects, CV at `/cv/`). The Lab page is hidden for now as `src/pages/_lab.astro` (files starting with `_` are not built).
 - `src/diagrams/<name>.ts`: SVG diagrams and plots, one module per figure. Shared code lives in `src/diagrams/lib/` (SVG builder, plotting panels, param store).
 - `src/lib/palette.ts`: the single source of truth for variable colors, used by both equations and diagrams.
-- `src/components/sketches/`: hand-drawn robot line art (`XLeRobot` in the home page hero and, shrunk to its head, the header icon; `AhaRobot` on the 404 page). Shared stroke styles are `.sketch` in `src/styles/global.css`; the wobble comes from an SVG displacement filter, so draw clean shapes and let the filter roughen them.
+- `src/components/sketches/`: hand-drawn robot line art (`XLeRobot` in the home page hero, `AhaRobot` on the 404 page). Shared stroke styles are `.sketch` in `src/styles/global.css`; the wobble comes from an SVG displacement filter, so draw clean shapes and let the filter roughen them.
 - `src/components/three/`: the MuJoCo + three.js robot demo (`RobotDemo`). Currently not shown anywhere; its home page section is commented out in `src/pages/index.astro`.
 
 ## Writing a post
