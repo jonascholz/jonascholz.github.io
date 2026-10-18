@@ -2,7 +2,7 @@
 import Base from '../layouts/Base.astro';
 import PostList from '../components/PostList.astro';
 import ProjectCard from '../components/ProjectCard.astro';
-import RobotDemo from '../components/three/RobotDemo.astro';
+// Hidden for now: import RobotDemo from '../components/three/RobotDemo.astro';
 import { getPosts, getProjects } from '../lib/content';
 import { site } from '../lib/site';
 
@@ -14,10 +14,10 @@ const projects = await getProjects();
   <section class="hero">
     <div class="dot-grid backdrop" aria-hidden="true"></div>
     <div class="container hero-inner">
-      <p class="status"><span class="pulse" aria-hidden="true"></span>PhD at KIT · world models for robotics</p>
+      <p class="status"><span class="pulse" aria-hidden="true"></span>PhD at KIT · generalist robots</p>
       <h1>
         Jona Scholz
-        <span>Robot learning and world models.</span>
+        <span>Toward generalist robots.</span>
       </h1>
       <p class="lede">
         I'm a researcher at <a href={site.affiliation.url}>ITIV, Karlsruhe Institute of Technology</a>. Before robots I spent
@@ -30,6 +30,7 @@ const projects = await getProjects();
       </p>
     </div>
 
+    {/* Hidden for now: live robot demo.
     <div class="container">
       <figure class="demo">
         <RobotDemo height="clamp(22rem, 46vw, 34rem)" />
@@ -39,6 +40,7 @@ const projects = await getProjects();
         </figcaption>
       </figure>
     </div>
+    */}
   </section>
 
   <section class="container section">

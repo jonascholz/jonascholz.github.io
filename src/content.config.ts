@@ -35,6 +35,8 @@ const projects = defineCollection({
       tags: z.array(z.string()).default([]),
       image: image().optional(),
       references,
+      /** Hidden from production builds, like post drafts. */
+      draft: z.boolean().default(false),
     }),
 });
 

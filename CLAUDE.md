@@ -1,15 +1,15 @@
-This is a personal website, mostly used as a research blog. The focus is now AI for robotics (world models, robot learning); older posts are about deep learning and spiking neural networks.
+This is a personal website, mostly used as a research blog. The focus is now AI for robotics (generalist robots, robot learning); older posts are about deep learning and spiking neural networks.
 
 The site is built with Astro (static output, deployed to GitHub Pages by `.github/workflows/deploy.yml` on every push to `master`). Run `npm run dev` for a local server, `npm run build` for a production build and `npm run check` for type checking.
 
 ## Layout
 
 - `src/content/posts/<date>-<name>/index.mdx`: one folder per blog post, with its images and videos next to it. The `permalink` in the front matter is the public URL. `draft: true` hides a post from production builds (it still shows in `npm run dev`).
-- `src/content/projects/<name>/index.mdx`, `src/content/publications/*.md`: same idea for projects and publications.
-- `src/pages/`: the routes (home, blog index, projects, CV at `/cv/`, lab, RSS at `/feed.xml`).
+- `src/content/projects/<name>/index.mdx`, `src/content/publications/*.md`: same idea for projects and publications. Projects also support `draft: true`.
+- `src/pages/`: the routes (home, blog index, projects, CV at `/cv/`, RSS at `/feed.xml`). The Lab page is hidden for now as `src/pages/_lab.astro` (files starting with `_` are not built).
 - `src/diagrams/<name>.ts`: SVG diagrams and plots, one module per figure. Shared code lives in `src/diagrams/lib/` (SVG builder, plotting panels, param store).
 - `src/lib/palette.ts`: the single source of truth for variable colors, used by both equations and diagrams.
-- `src/components/three/`: the MuJoCo + three.js robot demo (`RobotDemo`).
+- `src/components/three/`: the MuJoCo + three.js robot demo (`RobotDemo`). Currently not shown anywhere; its home page section is commented out in `src/pages/index.astro`.
 
 ## Writing a post
 
@@ -21,7 +21,7 @@ These components are available in every MDX file without importing them:
 - `<Diagram name="lif-neuron-diagram" props={{ ... }} />`: renders `src/diagrams/<name>.ts` to static SVG at build time.
 - `<Param name="x" type="range|number|select|checkbox" ... />` and `<Controls>`: controls bound to page params. Diagrams that declare `params` re-render when those params change. `<Show param="..." value="..." hidden>` toggles content.
 - `<Video src={clip} label="..." />`: looping silent video (use MP4 instead of GIF; `import clip from './clip.mp4'`).
-- `<RobotDemo />`: the interactive MuJoCo rover.
+- `<RobotDemo />`: the interactive MuJoCo rover (currently unregistered; re-enable it in `src/lib/content.ts`).
 
 Figures are plain `<figure id="fig:name">` with a `<Diagram>` or a Markdown image (`![alt](./image.png)`, surrounded by blank lines) and a `<figcaption>`.
 

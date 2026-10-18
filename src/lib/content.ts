@@ -5,10 +5,10 @@ import Param from '../components/Param.astro';
 import Controls from '../components/Controls.astro';
 import Show from '../components/Show.astro';
 import Video from '../components/Video.astro';
-import RobotDemo from '../components/three/RobotDemo.astro';
+// Hidden for now: import RobotDemo from '../components/three/RobotDemo.astro';
 
 /** Components every MDX file can use without importing them. */
-export const mdxComponents = { Notice, Diagram, Param, Controls, Show, Video, RobotDemo };
+export const mdxComponents = { Notice, Diagram, Param, Controls, Show, Video }; // + RobotDemo when the demo returns
 
 /** Published posts, newest first. Drafts are included in `astro dev`. */
 export async function getPosts() {
@@ -17,7 +17,8 @@ export async function getPosts() {
 }
 
 export async function getProjects() {
-  return (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+  const projects = await getCollection('projects', (p) => import.meta.env.DEV || !p.data.draft);
+  return projects.sort((a, b) => a.data.order - b.data.order);
 }
 
 export async function getPublications() {

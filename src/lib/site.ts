@@ -2,7 +2,7 @@ export const site = {
   name: 'Jona Scholz',
   title: 'Jona Scholz',
   description:
-    'PhD candidate at KIT working on world models for robotics. Notes on robot learning, deep learning and spiking neural networks.',
+    'PhD candidate at KIT working on generalist robots. Notes on robot learning, deep learning and spiking neural networks.',
   url: 'https://jonascholz.github.io',
   email: 'jona.m.scholz@gmail.com',
   location: 'Karlsruhe, Germany',
@@ -16,7 +16,7 @@ export const site = {
   nav: [
     { label: 'Writing', href: '/blog/' },
     { label: 'Projects', href: '/projects/' },
-    { label: 'Lab', href: '/lab/' },
+    // Hidden for now: { label: 'Lab', href: '/lab/' },
     { label: 'About', href: '/cv/' },
   ],
 } as const;

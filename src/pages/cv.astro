@@ -4,9 +4,6 @@ import Base from '../layouts/Base.astro';
 import profile from '../assets/profile.jpg';
 import { site } from '../lib/site';
 
-const skillIcons = import.meta.glob<{ default: ImageMetadata }>('../assets/skills/*.png', { eager: true });
-const icon = (name: string) => skillIcons[`../assets/skills/${name}.png`].default;
-
 const education = [
   { what: 'PhD at the Institut für Technik der Informationsverarbeitung (ITIV), KIT', when: 'ongoing' },
   { what: 'M.Sc. in Practical Computer Science, University of Hagen', when: '2025' },
@@ -14,7 +11,7 @@ const education = [
 ];
 
 const work = [
-  { role: 'PhD Candidate', org: 'KIT', when: '2025 - today', notes: ['Research on world models for robotics'] },
+  { role: 'PhD Candidate', org: 'KIT', when: '2025 - today', notes: ['Research on generalist robots'] },
   {
     role: 'Research Assistant',
     org: 'FZI (Research Center)',
@@ -27,7 +24,7 @@ const work = [
     org: 'University of Hagen',
     when: '2023 - 2024',
     notes: ['Developed a component for unsupervised ML, worked on the EU project KnowlEdge and supported the Chair of Data Science'],
-    link: '/projects/03_knowledge/',
+    // Hidden for now: link: '/projects/03_knowledge/',
   },
   {
     role: 'Software Developer',
@@ -36,41 +33,15 @@ const work = [
     notes: ['Created fullstack solutions for 3+ large German companies', 'Upheld best practices (Clean Code, CI/CD, Design Patterns and more)'],
   },
 ];
-
-const skills = [
-  {
-    group: 'AI & Neuromorphic Computing',
-    items: [
-      ['python', 'Python', 'https://www.python.org'],
-      ['lava', 'Lava', 'https://lava-nc.org'],
-      ['nest', 'Nest', 'https://www.nest-simulator.org'],
-      ['tensorflow', 'TensorFlow', 'https://www.tensorflow.org'],
-      ['sklearn', 'Scikit-learn', 'https://scikit-learn.org'],
-      ['pandas', 'Pandas', 'https://pandas.pydata.org'],
-      ['sql', 'SQL', 'https://www.postgresql.org'],
-    ],
-  },
-  {
-    group: 'Fullstack Development',
-    items: [
-      ['angular', 'Angular', 'https://angular.io'],
-      ['javascript', 'JavaScript', 'https://developer.mozilla.org/en-US/docs/Web/JavaScript'],
-      ['node', 'NodeJS', 'https://nodejs.org'],
-      ['react', 'React', 'https://react.dev'],
-      ['git', 'Git', 'https://git-scm.com'],
-      ['typescript', 'TypeScript', 'https://www.typescriptlang.org'],
-    ],
-  },
-];
 ---
 
-<Base title="About" description="About Jona Scholz: education, experience and skills.">
+<Base title="About" description="About Jona Scholz: education and experience.">
   <div class="container narrow page">
     <header class="intro">
       <Image src={profile} alt="Jona Scholz" width={400} height={400} class="photo" loading="eager" />
       <div>
         <h1 class="page-title">Hi, I'm Jona</h1>
-        <p>I'm working towards AGI. I wasted some time on SNNs and then went into world models. Prior to this I was a Software Developer.</p>
+        <p>I'm working towards AGI. I wasted some time on SNNs and then went into generalist robots. Prior to this I was a Software Developer.</p>
         <p class="contact">
           <a href={`mailto:${site.email}`}>{site.email}</a>
           {site.links.map((l) => <a href={l.url} rel="me noopener">{l.label}</a>)}
@@ -113,27 +84,6 @@ const skills = [
         }
       </ul>
     </section>
-
-    <section>
-      <h2>Skills</h2>
-      {
-        skills.map((s) => (
-          <>
-            <h3>{s.group}</h3>
-            <ul class="skills">
-              {s.items.map(([key, label, url]) => (
-                <li>
-                  <a href={url} rel="noopener">
-                    <Image src={icon(key)} alt="" width={48} height={48} />
-                    <span>{label}</span>
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </>
-        ))
-      }
-    </section>
   </div>
 </Base>
 
@@ -156,7 +106,6 @@ const skills = [
     object-fit: cover;
     flex-shrink: 0;
   }
-
 
   .intro p {
     margin: 0;
@@ -183,16 +132,6 @@ const skills = [
     font-weight: 640;
     letter-spacing: -0.025em;
     margin: 3.5rem 0 0.9rem;
-  }
-
-  h3 {
-    font-family: var(--font-mono);
-    font-weight: 500;
-    font-size: 0.78rem;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    color: var(--muted);
-    margin: 1.5rem 0 0.8rem;
   }
 
   .timeline {
@@ -235,35 +174,4 @@ const skills = [
     }
   }
 
-  .skills {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1.25rem;
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-
-  .skills a {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.4rem;
-    width: 5rem;
-    font-size: 0.82rem;
-    color: var(--muted);
-    text-decoration: none;
-    transition: transform 0.2s;
-  }
-
-  .skills a:hover {
-    transform: scale(1.08);
-    color: var(--fg);
-  }
-
-  .skills img {
-    width: 3rem;
-    height: 3rem;
-    object-fit: contain;
-  }
 </style>
