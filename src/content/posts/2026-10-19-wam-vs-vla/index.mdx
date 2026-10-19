@@ -1,5 +1,5 @@
 ---
-title: Compute efficiency of WAM vs VLA
+title: Additional Compute Cost of WAMs vs VLAs
 date: 2026-10-19
 permalink: /posts/2026/10/wam-vs-vla/
 unlisted: true
@@ -93,13 +93,13 @@ So in this setup the auxiliary loss makes every training sample about 70% more e
 
 <Controls>
 <Param name="ctx" type="range" label="n_c" color="nc" value={800} min={100} max={4000} step={50} digits={0} />
-<Param name="fut" type="range" label="n_f" color="nf" value={588} min={0} max={6000} step={4} digits={0} />
+<Param name="frames" type="range" label="future timesteps" color="nf" value={4} min={0} max={64} step={1} digits={0} />
 <Param name="act" type="range" label="n_a" color="na" value={50} min={10} max={200} step={5} digits={0} />
 </Controls>
 
 <figure id="fig:cost">
 <Diagram name="wam-vla-cost-plot" />
-<figcaption><strong>Figure 4:</strong> Training compute of a WAM relative to a VLA with the same size and context, the ratio of $\eqref{eq:train_wam}$ to $\eqref{eq:train_vla}$.</figcaption>
+<figcaption><strong>Figure 4:</strong> Training compute of a WAM relative to a VLA with the same size and context, the ratio of $\eqref{eq:train_wam}$ to $\eqref{eq:train_vla}$. Future timesteps become tokens as above: every 4 timesteps add one latent frame, $3 \times 196 = 588$ tokens.</figcaption>
 </figure>
 
 ## Inference costs
