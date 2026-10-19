@@ -1,6 +1,6 @@
 import { defineDiagram } from './lib/define';
-import { axis, grid, group, h, ink, muted, nodeFill, path, rect, svg, text, translate } from './lib/svg';
-import { color } from '../lib/palette';
+import { banana, feather } from './lib/objects';
+import { axis, grid, group, h, ink, muted, rect, svg, text, translate } from './lib/svg';
 
 /**
  * Next-frame prediction needs physics: a falling banana speeds up, a feather
@@ -47,27 +47,3 @@ export default defineDiagram({
     );
   },
 });
-
-/** A banana lying on its side, roughly 44 × 20, centered on (x, y). */
-function banana(x: number, y: number) {
-  return translate(
-    x,
-    y,
-    path('M-21 -4 Q-2 16 21 -6 Q4 4 -21 -4 Z', { fill: color('goldenrod'), color: ink, width: 1.5 }),
-    path('M21 -6 L24 -10', { color: ink, width: 2.5, cap: 'round' }),
-  );
-}
-
-/** A feather tilted slightly, roughly 40 × 14, centered on (x, y). */
-function feather(x: number, y: number) {
-  return translate(
-    x,
-    y,
-    h(
-      'g',
-      { transform: 'rotate(-12)' },
-      path('M-20 0 Q0 -10 20 0 Q0 10 -20 0 Z', { fill: nodeFill, color: color('gray'), width: 1.5 }),
-      path('M-24 0 L20 0', { color: color('gray'), width: 1.5, cap: 'round' }),
-    ),
-  );
-}

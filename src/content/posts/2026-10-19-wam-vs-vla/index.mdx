@@ -1,6 +1,5 @@
 ---
 title: Compute efficiency of WAM vs VLA
-description: Where the compute goes when a robot policy is built on a video model instead of a vision language model.
 date: 2026-10-19
 permalink: /posts/2026/10/wam-vs-vla/
 unlisted: true
@@ -46,21 +45,26 @@ Video generation requires a pretty sophisticated understanding of the world. Con
 
 In general, generating future frames requires understanding the mechanics of the world to some extent. Just as this knowledge of the world can be used to predict banana dynamics, we can use it to predict robot dynamics. In fact, we can use this world understanding already encoded in the model weights to predict the robot actions that reach a target state.
 
-From the vision language side, there is also an understanding of the world. But it is less visual. Most of the training data is text and some of it is text-image pairs. The output is almost always text.
+From the vision language side, there is also an understanding of the world. But it is less visual. Most of the training data is text and some of it is text-image pairs. The output is almost always text, as in [Figure 2](#fig:vlm).
+
+<figure id="fig:vlm">
+<Diagram name="vlm-qa-diagram" />
+<figcaption><strong>Figure 2:</strong> A vision language model gets an image and a text prompt and answers in text.</figcaption>
+</figure>
 
 So both start from a pretrained model with some knowledge of the world. The question for this post is a more practical one: which of the two is cheaper to train and to run?
 
 ## Input and output formats
 
-Let's assume everything is evenly matched: both models have the same number of parameters $\cP{P}$ and see the same context, so there are as many input tokens for the WAM as there are for the VLA. We call this number $\cLc{L_c}$; it covers the text prompt and the current camera images. The context will look like [Figure 2](#fig:context).
+Let's assume everything is evenly matched: both models have the same number of parameters $\cP{P}$ and see the same context, so there are as many input tokens for the WAM as there are for the VLA. We call this number $\cLc{L_c}$; it covers the text prompt and the current camera images. The context will look like [Figure 3](#fig:context).
 
 <figure id="fig:context">
 <Diagram name="wam-vla-context-diagram" props={{ context: 800, future: 588, actions: 50 }} />
-<figcaption><strong>Figure 2:</strong> Token sequences of a VLA and a WAM with the same context, drawn to scale for the example numbers used in this post. Both denoise an action chunk; the WAM also denoises future frames.</figcaption>
+<figcaption><strong>Figure 3:</strong> Token sequences of a VLA and a WAM with the same context, drawn to scale for the example numbers used in this post. Both denoise an action chunk; the WAM also denoises future frames.</figcaption>
 </figure>
 
 <details>
-<summary>Why would the input token count differ?</summary>
+<summary>Note, in practice these are not evenly matched!</summary>
 
 In practice WAMs will usually use the VAE of the video model to encode the image data, whereas VLAs typically use a ViT. They split an image into tokens differently:
 
@@ -118,7 +122,7 @@ Caching only works if the context tokens don't attend to the noisy tokens. π0 u
 
 </details>
 
-You can play with the numbers in [Figure 3](#fig:cost).
+You can play with the numbers in [Figure 4](#fig:cost).
 
 <Controls>
 <Param name="ctx" type="range" label="Lc" color="Lc" value={800} min={100} max={4000} step={50} digits={0} />
@@ -129,12 +133,12 @@ You can play with the numbers in [Figure 3](#fig:cost).
 
 <figure id="fig:cost">
 <Diagram name="wam-vla-cost-plot" />
-<figcaption><strong>Figure 3:</strong> Compute of a WAM relative to a VLA with the same size and context, from equations $\ref{eq:train_vla}$ to $\ref{eq:inf_wam}$. "WAM, action only" skips the future frames at inference.</figcaption>
+<figcaption><strong>Figure 4:</strong> Compute of a WAM relative to a VLA with the same size and context, from equations $\ref{eq:train_vla}$ to $\ref{eq:inf_wam}$. "WAM, action only" skips the future frames at inference.</figcaption>
 </figure>
 
 Published WAMs show the same picture. Cosmos Policy, built on the 2B Cosmos-Predict2 model, takes about 0.61 s on an H100 for one prediction with 5 denoising steps, generating the action chunk, the future state and a value estimate together [@cosmospolicy]. DreamZero, built on the 14B Wan2.1 image-to-video model, generates action chunks at about 7 Hz, but only after system optimizations that sped up inference by 38× [@dreamzero]. These numbers come from different hardware, model sizes and tasks, so they are not a clean comparison with π0's 73 ms. The gap is still hard to miss.
 
-There are ways around it. The most direct one is to not generate the video at inference. UVA learns a joint video-action latent and decodes actions and video with two separate lightweight diffusion heads, so a policy step can skip the video head entirely; action-only inference takes about 95 ms with 16 diffusion steps [@uva]. The video prediction then acts purely as a training signal, and inference costs about as much as a VLA of the same size (the "WAM, action only" bar in [Figure 3](#fig:cost)). Other knobs are fewer denoising steps, fewer or smaller future frames, and caching. DreamZero, for example, generates autoregressively with a KV cache and replaces its own predicted frames with the real observations after each executed chunk [@dreamzero].
+There are ways around it. The most direct one is to not generate the video at inference. UVA learns a joint video-action latent and decodes actions and video with two separate lightweight diffusion heads, so a policy step can skip the video head entirely; action-only inference takes about 95 ms with 16 diffusion steps [@uva]. The video prediction then acts purely as a training signal, and inference costs about as much as a VLA of the same size (the "WAM, action only" bar in [Figure 4](#fig:cost)). Other knobs are fewer denoising steps, fewer or smaller future frames, and caching. DreamZero, for example, generates autoregressively with a KV cache and replaces its own predicted frames with the real observations after each executed chunk [@dreamzero].
 
 ## Takeaways
 
