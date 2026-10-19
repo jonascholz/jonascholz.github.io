@@ -26,6 +26,7 @@ export const colors = {
   magenta: { light: '#ff00ff', dark: '#ff7cff' },
   gray: { light: '#808080', dark: '#a8a8a8' },
   cyan: { light: '#00ffff', dark: '#5ff0ff' },
+  goldenrod: { light: '#c8901a', dark: '#f0c75e' },
 } as const;
 
 export type ColorName = keyof typeof colors;
@@ -51,6 +52,12 @@ export const variables = {
   yhat: 'green',
   ytarget: 'magenta',
   delta: 'gray',
+  // Compute accounting (WAM vs VLA post)
+  P: 'red',
+  Lc: 'purple',
+  Lf: 'blue',
+  La: 'orange',
+  K: 'ForestGreen',
 } as const satisfies Record<string, ColorName>;
 
 export type VariableName = keyof typeof variables;

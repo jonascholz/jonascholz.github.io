@@ -10,10 +10,15 @@ import Video from '../components/Video.astro';
 /** Components every MDX file can use without importing them. */
 export const mdxComponents = { Notice, Diagram, Param, Controls, Show, Video }; // + RobotDemo when the demo returns
 
-/** Published posts, newest first. Drafts are included in `astro dev`. */
-export async function getPosts() {
+/** Every post that gets a page, newest first: published and unlisted ones, plus drafts in `astro dev`. */
+export async function getAllPosts() {
   const posts = await getCollection('posts', (p) => import.meta.env.DEV || !p.data.draft);
   return posts.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+}
+
+/** Posts shown in lists, newest first: like `getAllPosts()` without the unlisted ones. */
+export async function getPosts() {
+  return (await getAllPosts()).filter((p) => !p.data.unlisted);
 }
 
 export async function getProjects() {

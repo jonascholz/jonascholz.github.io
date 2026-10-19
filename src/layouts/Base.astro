@@ -15,6 +15,8 @@ interface Props {
   /** Load the MathJax stylesheet (pages with rendered math). */
   math?: boolean;
   type?: 'website' | 'article';
+  /** Ask search engines not to index the page. */
+  noindex?: boolean;
   /** Height of the graph paper behind the top of the page. */
   paper?: 'short' | 'tall';
 }
@@ -26,6 +28,7 @@ const {
   math = false,
   type = 'website',
   paper = 'short',
+  noindex = false,
 } = Astro.props;
 const fullTitle = title ? `${title} · ${site.name}` : site.title;
 const canonical = new URL(Astro.url.pathname, Astro.site);
@@ -41,6 +44,7 @@ const isActive = (href: string) => path === href || (href !== '/' && path.starts
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex" />}
     <link rel="canonical" href={canonical} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
