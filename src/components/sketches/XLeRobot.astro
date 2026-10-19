@@ -3,64 +3,61 @@
  * Sketch of an XLeRobot: an IKEA cart on an omniwheel base with two SO-101
  * arms (one waving, one holding a mug) and a pan-tilt RealSense head.
  * Line art in the hand-drawn style shared by all sketches (see .sketch in
- * global.css): plain shapes, roughened by an SVG displacement filter.
+ * global.css): plain shapes, roughened at build time by `rough()`.
  */
+import { rough } from './rough';
+
 interface Props {
   class?: string;
 }
 
 const { class: className } = Astro.props;
+const r = rough(4);
 ---
 
 <svg class:list={['sketch', className]} viewBox="0 0 200 260" aria-hidden="true">
-  <defs>
-    <filter id="sketch-xlerobot" x="-5%" y="-5%" width="110%" height="110%">
-      <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="4"></feTurbulence>
-      <feDisplacementMap in="SourceGraphic" scale="3.2"></feDisplacementMap>
-    </filter>
-  </defs>
-  <g filter="url(#sketch-xlerobot)">
+  <g>
     {/* back legs */}
-    <path class="thin" d="M60 72V214M140 72V214"/>
+    <path class="thin" d={r.path('M60 72V214M140 72V214')} />
     {/* trays: top, middle, bottom */}
     <g>
-      <path class="fill" d="M40 72h120l-4 22H44z"/>
-      <path class="line" d="M52 64h96l12 8H40z M40 72h120l-4 22H44z"/>
-      <path class="thin" d="M88 82h24"/>
+      <path class="fill" d={r.path('M40 72h120l-4 22H44z')} />
+      <path class="line" d={r.path('M52 64h96l12 8H40z M40 72h120l-4 22H44z')} />
+      <path class="thin" d={r.path('M88 82h24')} />
     </g>
     <g>
-      <path class="fill" d="M40 136h120l-4 20H44z"/>
-      <path class="line" d="M52 129h96l12 7H40z M40 136h120l-4 20H44z"/>
-      <rect class="line" x="70" y="116" width="30" height="13" rx="2"/><path class="thin" d="M106 129v-9h18v9"/>
+      <path class="fill" d={r.path('M40 136h120l-4 20H44z')} />
+      <path class="line" d={r.path('M52 129h96l12 7H40z M40 136h120l-4 20H44z')} />
+      <path class="line" d={r.rect(70, 116, 30, 13, 2)} /><path class="thin" d={r.path('M106 129v-9h18v9')} />
     </g>
     <g>
-      <path class="fill" d="M40 196h120l-4 20H44z"/>
-      <path class="line" d="M52 189h96l12 7H40z M40 196h120l-4 20H44z"/>
+      <path class="fill" d={r.path('M40 196h120l-4 20H44z')} />
+      <path class="line" d={r.path('M52 189h96l12 7H40z M40 196h120l-4 20H44z')} />
     </g>
     {/* front legs */}
-    <path class="line" d="M44 94V196M156 94V196M44 156v40M156 156v40"/>
+    <path class="line" d={r.path('M44 94V196M156 94V196M44 156v40M156 156v40')} />
     {/* lekiwi base */}
-    <path class="line" d="M58 216h84l-10 12H68z"/>
-    <circle class="line" cx="64" cy="236" r="12"/><circle class="line" cx="136" cy="236" r="12"/>
-    <path class="thin" d="M64 226v20M54 236h20M136 226v20M126 236h20"/>
-    <path class="thin" d="M93 228a7 7 0 0 1 14 0"/>
+    <path class="line" d={r.path('M58 216h84l-10 12H68z')} />
+    <path class="line" d={r.circle(64, 236, 12)} /><path class="line" d={r.circle(136, 236, 12)} />
+    <path class="thin" d={r.path('M64 226v20M54 236h20M136 226v20M126 236h20')} />
+    <path class="thin" d={r.path('M93 228a7 7 0 0 1 14 0')} />
     {/* head: neck, pan-tilt, realsense */}
-    <path class="line" d="M100 64V40"/>
-    <rect class="line" x="92" y="30" width="16" height="11" rx="2"/>
-    <rect class="fill" x="74" y="14" width="52" height="15" rx="5"/>
-    <rect class="line" x="74" y="14" width="52" height="15" rx="5"/>
-    <circle class="solid" cx="88" cy="21.5" r="3.6"/><circle class="solid" cx="112" cy="21.5" r="3.6"/><circle class="thin" cx="100" cy="21.5" r="1.8"/>
+    <path class="line" d={r.path('M100 64V40')} />
+    <path class="line" d={r.rect(92, 30, 16, 11, 2)} />
+    <path class="fill" d={r.rect(74, 14, 52, 15, 5)} />
+    <path class="line" d={r.rect(74, 14, 52, 15, 5)} />
+    <path class="solid" d={r.circle(88, 21.5, 3.6)} /><path class="solid" d={r.circle(112, 21.5, 3.6)} /><path class="thin" d={r.circle(100, 21.5, 1.8)} />
     {/* left SO-101 arm, waving */}
-    <rect class="fill" x="43" y="53" width="18" height="11" rx="3"/><rect class="line" x="43" y="53" width="18" height="11" rx="3"/>
-    <path class="link" d="M52 52 38 26 18 36"/><path class="link-core" d="M52 52 38 26 18 36"/>
-    <circle class="fill" cx="38" cy="26" r="4"/><circle class="line" cx="38" cy="26" r="4"/>
-    <path class="line" d="M18 36 10 24M18 36 7 32"/>
+    <path class="fill" d={r.rect(43, 53, 18, 11, 3)} /><path class="line" d={r.rect(43, 53, 18, 11, 3)} />
+    <path class="link" d={r.path('M52 52 38 26 18 36')} /><path class="link-core" d={r.path('M52 52 38 26 18 36')} />
+    <path class="fill" d={r.circle(38, 26, 4)} /><path class="line" d={r.circle(38, 26, 4)} />
+    <path class="line" d={r.path('M18 36 10 24M18 36 7 32')} />
     {/* right SO-101 arm, holding a mug */}
-    <rect class="fill" x="139" y="53" width="18" height="11" rx="3"/><rect class="line" x="139" y="53" width="18" height="11" rx="3"/>
-    <path class="link" d="M148 52 166 32 180 54"/><path class="link-core" d="M148 52 166 32 180 54"/>
-    <circle class="fill" cx="166" cy="32" r="4"/><circle class="line" cx="166" cy="32" r="4"/>
-    <path class="line" d="M180 54 175 63M180 54l7 8"/>
-    <path class="fill" d="M171 64h17l-2 15h-13z"/><path class="line" d="M171 64h17l-2 15h-13z M188 67c5 0 5 7-1 7"/>
-    <path class="steam" d="M176 60c-2-3 2-4 0-7M182 60c-2-3 2-4 0-7"/>
+    <path class="fill" d={r.rect(139, 53, 18, 11, 3)} /><path class="line" d={r.rect(139, 53, 18, 11, 3)} />
+    <path class="link" d={r.path('M148 52 166 32 180 54')} /><path class="link-core" d={r.path('M148 52 166 32 180 54')} />
+    <path class="fill" d={r.circle(166, 32, 4)} /><path class="line" d={r.circle(166, 32, 4)} />
+    <path class="line" d={r.path('M180 54 175 63M180 54l7 8')} />
+    <path class="fill" d={r.path('M171 64h17l-2 15h-13z')} /><path class="line" d={r.path('M171 64h17l-2 15h-13z M188 67c5 0 5 7-1 7')} />
+    <path class="steam" d={r.path('M176 60c-2-3 2-4 0-7M182 60c-2-3 2-4 0-7')} />
   </g>
 </svg>
