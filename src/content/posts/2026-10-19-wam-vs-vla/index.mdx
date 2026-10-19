@@ -66,12 +66,7 @@ Let's assume everything is evenly matched: both models have the same number of p
 <details>
 <summary>Note, in practice these are not evenly matched!</summary>
 
-In practice WAMs will usually use the VAE of the video model to encode the image data, whereas VLAs typically use a ViT. They split an image into tokens differently:
-
-- A ViT like SigLIP So400m/14, the image encoder of PaliGemma and π0, cuts the image into patches of 14×14 pixels. A 224×224 image becomes a 16×16 grid, so 256 tokens [@paligemma].
-- The Wan2.1 VAE compresses 8× in height and width and 4× in time, and the transformer then merges 2×2 latent pixels into one token [@wan]. One token covers 16×16 pixels and 4 frames. A 224×224 image becomes 14×14 = 196 tokens, and a clip of $T$ frames becomes $1 + T/4$ latent frames, since the first frame is encoded on its own.
-
-So for a single image at the same resolution the counts are in the same ballpark. The differences come from elsewhere. Video models are trained at higher resolutions: Wan2.1-I2V-14B-480P works at 480p, where a single 480×832 latent frame is already 30×52 = 1560 tokens. On the other hand, the VAE compresses time, so a history of several frames is cheaper for a WAM than for a VLA that encodes every frame separately. The tokens also carry different information: a VAE latent is built to reconstruct pixels, while a SigLIP token is trained to line up with text.
+WAMs encode images with the video model's VAE, VLAs with a ViT. At 224×224 the counts are similar: 256 tokens with SigLIP [@paligemma], 196 with Wan2.1 [@wan]. But video models run at higher resolutions (one 480p frame is 1560 tokens), while their VAE packs 4 frames into one latent frame, which makes a history of frames cheap.
 
 </details>
 
