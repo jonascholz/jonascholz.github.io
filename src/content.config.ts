@@ -21,6 +21,8 @@ const posts = defineCollection({
       references,
       /** Drafts render in `npm run dev` only. */
       draft: z.boolean().default(false),
+      /** Built and reachable by its permalink, but left out of every list, the pager and the sitemap. */
+      unlisted: z.boolean().default(false),
     }),
 });
 

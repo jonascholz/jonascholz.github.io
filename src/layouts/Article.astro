@@ -18,6 +18,8 @@ interface Props {
   back?: { label: string; href: string };
   prev?: { title: string; href: string };
   next?: { title: string; href: string };
+  /** Ask search engines not to index the page (unlisted posts). */
+  noindex?: boolean;
 }
 
 const {
@@ -33,12 +35,13 @@ const {
   back,
   prev,
   next,
+  noindex,
 } = Astro.props;
 const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
 if (references.length > 0) toc.push({ depth: 2, slug: 'references', text: 'References' });
 ---
 
-<Base title={title} description={description} image={image} math type="article">
+<Base title={title} description={description} image={image} math type="article" noindex={noindex}>
   <div class="progress" aria-hidden="true"></div>
   <div class="container layout">
     <article class="article">

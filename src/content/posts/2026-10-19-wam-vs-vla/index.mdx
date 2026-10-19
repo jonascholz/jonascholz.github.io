@@ -1,0 +1,145 @@
+---
+title: Compute efficiency of WAM vs VLA
+description: Where the compute goes when a robot policy is built on a video model instead of a vision language model.
+date: 2026-10-19
+permalink: /posts/2026/10/wam-vs-vla/
+unlisted: true
+tags:
+  - Robotics
+  - WAM
+  - VLA
+references:
+  - id: pi0
+    text: 'K. Black et al., "π0: A Vision-Language-Action Flow Model for General Robot Control," arXiv:2410.24164, 2024. <a href="https://arxiv.org/abs/2410.24164">paper</a>'
+  - id: pi05
+    text: 'Physical Intelligence et al., "π0.5: a Vision-Language-Action Model with Open-World Generalization," arXiv:2504.16054, 2025. <a href="https://arxiv.org/abs/2504.16054">paper</a>'
+  - id: paligemma
+    text: 'L. Beyer et al., "PaliGemma: A versatile 3B VLM for transfer," arXiv:2407.07726, 2024. <a href="https://arxiv.org/abs/2407.07726">paper</a>'
+  - id: wan
+    text: 'Team Wan et al., "Wan: Open and Advanced Large-Scale Video Generative Models," arXiv:2503.20314, 2025. <a href="https://arxiv.org/abs/2503.20314">paper</a>'
+  - id: kaplan
+    text: 'J. Kaplan et al., "Scaling Laws for Neural Language Models," arXiv:2001.08361, 2020. <a href="https://arxiv.org/abs/2001.08361">paper</a>'
+  - id: cosmospolicy
+    text: '"Cosmos Policy: Fine-Tuning Video Models for Visuomotor Control and Planning," <i>ICLR</i>, 2026. <a href="https://arxiv.org/abs/2601.16163">paper</a>'
+  - id: dreamzero
+    text: '"World Action Models are Zero-shot Policies" (DreamZero), arXiv:2602.15922, 2026. <a href="https://arxiv.org/abs/2602.15922">paper</a>'
+  - id: uva
+    text: 'S. Li, Y. Gao, D. Sadigh, S. Song, "Unified Video Action Model," <i>RSS</i>, 2025. <a href="https://arxiv.org/abs/2503.00200">paper</a>'
+---
+
+<Notice>
+
+**Work in progress.** The compute numbers in this post are back-of-the-envelope estimates, not measurements.
+
+</Notice>
+
+A world action model (WAM) adapts a video generation model for robotics. This is a competing approach to a vision language action model (VLA), which adapts vision language models.
+
+## Motivation
+
+Video generation requires a pretty sophisticated understanding of the world. Consider the banana in [Figure 1](#fig:falling). If we ask a model to generate the next frame in this sequence, it has to make sense of what's happening here. The banana is in mid-air, therefore it is likely pulled down by gravity. The distance the banana covers until the next frame would be different for another object such as a feather.
+
+<figure id="fig:falling">
+<Diagram name="falling-objects-diagram" />
+<figcaption><strong>Figure 1:</strong> To predict the next frame, the model has to know that a banana falls faster and faster, while a feather drifts down slowly.</figcaption>
+</figure>
+
+In general, generating future frames requires understanding the mechanics of the world to some extent. Just as this knowledge of the world can be used to predict banana dynamics, we can use it to predict robot dynamics. In fact, we can use this world understanding already encoded in the model weights to predict the robot actions that reach a target state.
+
+From the vision language side, there is also an understanding of the world. But it is less visual. Most of the training data is text and some of it is text-image pairs. The output is almost always text.
+
+So both start from a pretrained model with some knowledge of the world. The question for this post is a more practical one: which of the two is cheaper to train and to run?
+
+## Input and output formats
+
+Let's assume everything is evenly matched: both models have the same number of parameters $\cP{P}$ and see the same context, so there are as many input tokens for the WAM as there are for the VLA. We call this number $\cLc{L_c}$; it covers the text prompt and the current camera images. The context will look like [Figure 2](#fig:context).
+
+<figure id="fig:context">
+<Diagram name="wam-vla-context-diagram" props={{ context: 800, future: 588, actions: 50 }} />
+<figcaption><strong>Figure 2:</strong> Token sequences of a VLA and a WAM with the same context, drawn to scale for the example numbers used in this post. Both denoise an action chunk; the WAM also denoises future frames.</figcaption>
+</figure>
+
+<details>
+<summary>Why would the input token count differ?</summary>
+
+In practice WAMs will usually use the VAE of the video model to encode the image data, whereas VLAs typically use a ViT. They split an image into tokens differently:
+
+- A ViT like SigLIP So400m/14, the image encoder of PaliGemma and π0, cuts the image into patches of 14×14 pixels. A 224×224 image becomes a 16×16 grid, so 256 tokens [@paligemma].
+- The Wan2.1 VAE compresses 8× in height and width and 4× in time, and the transformer then merges 2×2 latent pixels into one token [@wan]. One token covers 16×16 pixels and 4 frames. A 224×224 image becomes 14×14 = 196 tokens, and a clip of $T$ frames becomes $1 + T/4$ latent frames, since the first frame is encoded on its own.
+
+So for a single image at the same resolution the counts are in the same ballpark. The differences come from elsewhere. Video models are trained at higher resolutions: Wan2.1-I2V-14B-480P works at 480p, where a single 480×832 latent frame is already 30×52 = 1560 tokens. On the other hand, the VAE compresses time, so a history of several frames is cheaper for a WAM than for a VLA that encodes every frame separately. The tokens also carry different information: a VAE latent is built to reconstruct pixels, while a SigLIP token is trained to line up with text.
+
+</details>
+
+For the output, we usually predict an action chunk that contains the next $\cLa{L_a}$ actions, for example $\cLa{L_a} = 50$ in π0.5 [@pi05]. With flow matching or diffusion, the chunk enters the sequence as noisy tokens and the model learns to denoise them. However, this does not account for auxiliary losses.
+
+## Training costs
+
+A WAM will often use next-frame prediction as an auxiliary loss. This requires many more output tokens than a VLA. And they clog up the input token context, too, since we condition on these noisy frames: just like the noisy actions, the noisy future frames are part of the sequence the model processes.
+
+To put a number on it, we use the usual rule of thumb that a forward and backward pass costs about 6 FLOPs per parameter per token [@kaplan]. We ignore attention for now. With $\cLf{L_f}$ future frame tokens, the training cost per sample is
+
+$$
+\begin{align}
+C_\text{train}^\text{VLA} &\approx 6\cP{P}\left(\cLc{L_c} + \cLa{L_a}\right) \label{eq:train_vla} \\
+C_\text{train}^\text{WAM} &\approx 6\cP{P}\left(\cLc{L_c} + \cLf{L_f} + \cLa{L_a}\right) \label{eq:train_wam}
+\end{align}
+$$
+
+Let's plug in some numbers. A π0-style VLA with three cameras at 224×224 has $3 \times 256 = 768$ image tokens, so with a short prompt $\cLc{L_c} \approx 800$. If the WAM predicts one future latent frame per camera with a Wan-style tokenizer, that is $\cLf{L_f} = 3 \times 196 = 588$ tokens. With $\cLa{L_a} = 50$, the ratio of $\eqref{eq:train_wam}$ to $\eqref{eq:train_vla}$ is
+
+$$
+\frac{800 + 588 + 50}{800 + 50} \approx 1.7
+$$
+
+So in this setup the auxiliary loss makes every training sample about 70% more expensive, and that is the cheap case: one latent frame at a low resolution. More future frames or the native 480p resolution of the video model grow $\cLf{L_f}$ quickly. And the attention cost we ignored grows with the square of the sequence length, so it penalizes the longer WAM sequence even more.
+
+## Inference costs
+
+At inference the question is whether the WAM has to generate the future frames at all.
+
+Take π0 as the VLA baseline. It splits the work in two. The context goes through the vision language model once and its keys and values are cached. Then a smaller action expert (300M parameters next to a 3B VLM) runs $\cK{K} = 10$ integration steps over only the action tokens, attending to the cached context [@pi0]. On an RTX 4090 with three cameras this takes 73 ms in total: 14 ms for the image encoders, 32 ms for the context and 27 ms for all ten action steps [@pi0].
+
+A WAM that denoises video and actions jointly has the future frames inside that loop. At every denoising step it processes $\cLf{L_f} + \cLa{L_a}$ tokens instead of $\cLa{L_a}$. With a forward pass at about 2 FLOPs per parameter per token, and the context encoded once and cached, the cost per action chunk is
+
+$$
+\begin{align}
+C_\text{inf}^\text{VLA} &\approx 2\cP{P}\left(\cLc{L_c} + \cK{K}\cLa{L_a}\right) \label{eq:inf_vla} \\
+C_\text{inf}^\text{WAM} &\approx 2\cP{P}\left(\cLc{L_c} + \cK{K}\left(\cLf{L_f} + \cLa{L_a}\right)\right) \label{eq:inf_wam}
+\end{align}
+$$
+
+Here $\cLf{L_f}$ gets multiplied by the number of denoising steps $\cK{K}$. With the numbers from above, $\eqref{eq:inf_wam}$ is about $5.5\times$ $\eqref{eq:inf_vla}$, compared to $1.7\times$ for training. To keep the comparison fair, both formulas use the same $\cP{P}$ for the denoising steps. π0's small action expert makes the real VLA even cheaper.
+
+<details>
+<summary>What if the context can't be cached?</summary>
+
+Caching only works if the context tokens don't attend to the noisy tokens. π0 uses a block-wise causal attention mask for exactly this reason [@pi0]. If every token attends to every other token, as in a plain bidirectional transformer, the context changes whenever the noisy tokens change, and each denoising step has to process the whole sequence: $\cK{K}(\cLc{L_c} + \cLf{L_f} + \cLa{L_a})$ tokens instead of $\cLc{L_c} + \cK{K}(\cLf{L_f} + \cLa{L_a})$.
+
+</details>
+
+You can play with the numbers in [Figure 3](#fig:cost).
+
+<Controls>
+<Param name="ctx" type="range" label="Lc" color="Lc" value={800} min={100} max={4000} step={50} digits={0} />
+<Param name="fut" type="range" label="Lf" color="Lf" value={588} min={0} max={6000} step={4} digits={0} />
+<Param name="act" type="range" label="La" color="La" value={50} min={10} max={200} step={5} digits={0} />
+<Param name="steps" type="range" label="K" color="K" value={10} min={1} max={50} step={1} digits={0} />
+</Controls>
+
+<figure id="fig:cost">
+<Diagram name="wam-vla-cost-plot" />
+<figcaption><strong>Figure 3:</strong> Compute of a WAM relative to a VLA with the same size and context, from equations $\ref{eq:train_vla}$ to $\ref{eq:inf_wam}$. "WAM, action only" skips the future frames at inference.</figcaption>
+</figure>
+
+Published WAMs show the same picture. Cosmos Policy, built on the 2B Cosmos-Predict2 model, takes about 0.61 s on an H100 for one prediction with 5 denoising steps, generating the action chunk, the future state and a value estimate together [@cosmospolicy]. DreamZero, built on the 14B Wan2.1 image-to-video model, generates action chunks at about 7 Hz, but only after system optimizations that sped up inference by 38× [@dreamzero]. These numbers come from different hardware, model sizes and tasks, so they are not a clean comparison with π0's 73 ms. The gap is still hard to miss.
+
+There are ways around it. The most direct one is to not generate the video at inference. UVA learns a joint video-action latent and decodes actions and video with two separate lightweight diffusion heads, so a policy step can skip the video head entirely; action-only inference takes about 95 ms with 16 diffusion steps [@uva]. The video prediction then acts purely as a training signal, and inference costs about as much as a VLA of the same size (the "WAM, action only" bar in [Figure 3](#fig:cost)). Other knobs are fewer denoising steps, fewer or smaller future frames, and caching. DreamZero, for example, generates autoregressively with a KV cache and replaces its own predicted frames with the real observations after each executed chunk [@dreamzero].
+
+## Takeaways
+
+- **Training:** the future frame loss makes the sequence longer. In our example that is about $1.7\times$ the compute per sample, and more with more frames, higher resolutions or the attention cost.
+- **Inference:** if the WAM denoises video and actions jointly, the future frames are multiplied by the number of denoising steps $\cK{K}$, which made it about $5.5\times$ more expensive in our example. If it can skip the video, it costs about as much as a VLA.
+- **Evenly matched is rare:** in practice WAMs are built on large video backbones (2B to 14B parameters in the examples above) at video resolutions, while VLAs like π0 pair a 3B VLM with a small action expert. Both push the real gap further in the VLA's favor.
+
+{/* TODO: Does the WAM keep its advantage when the video is dropped at inference? */}
