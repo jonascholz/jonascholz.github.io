@@ -52,11 +52,11 @@ export const variables = {
   yhat: 'green',
   ytarget: 'magenta',
   delta: 'gray',
-  // Compute accounting (WAM vs VLA post)
-  P: 'red',
-  Lc: 'purple',
-  Lf: 'blue',
-  La: 'orange',
+  // Compute accounting (WAM vs VLA post), notation after Kaplan et al.
+  N: 'red',
+  nc: 'purple',
+  nf: 'blue',
+  na: 'orange',
   K: 'ForestGreen',
 } as const satisfies Record<string, ColorName>;
 

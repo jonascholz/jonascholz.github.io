@@ -22,7 +22,7 @@ export default defineDiagram<Props>({
     const scale = (W - x0 - 24) / (context + future + actions);
     const barH = 40;
 
-    const C = { context: varColor('Lc'), future: varColor('Lf'), actions: varColor('La') };
+    const C = { context: varColor('nc'), future: varColor('nf'), actions: varColor('na') };
     const hatch = (key: keyof typeof C) =>
       h(
         'pattern',
@@ -69,7 +69,7 @@ export default defineDiagram<Props>({
       row(126, 'WAM', [ctx, fut, act]),
       rect(x0, 222, 14, 14, { fill: ink, width: 0, rx: 2 }),
       text(x0 + 22, 233, 'clean, used as conditioning', { anchor: 'start', size: 12, color: muted }),
-      rect(x0 + 230, 222, 14, 14, { fill: `url(#${id}-hatch-actions)`, color: varColor('La'), width: 1, rx: 2 }),
+      rect(x0 + 230, 222, 14, 14, { fill: `url(#${id}-hatch-actions)`, color: varColor('na'), width: 1, rx: 2 }),
       text(x0 + 252, 233, 'noisy, denoised by the model', { anchor: 'start', size: 12, color: muted }),
     );
   },
